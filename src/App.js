@@ -28,7 +28,6 @@ class App extends Component {
 
     e.layer.setStyle(highlightStyle)
 
-
     const { layer, latlng } = e
     const { id } = layer.feature.properties
     const dm = data.find(({ GeoUID }) => GeoUID === Number(id))
@@ -57,12 +56,15 @@ class App extends Component {
     const color = getColor(feature)
 
     return {
-    fillColor: color,
-    fillOpacity: .7,
-    color: '#d1c4e9',
-    opacity: .7,
-    weight: 1
+      fillColor: color,
+      fillOpacity: 0.7,
+      color: '#d1c4e9',
+      opacity: 0.7,
+      weight: 1
     }
+  }
+  zoomLevelChange = e => {
+    console.log('zoom level: ', e.target._zoom)
   }
   render() {
     const { neighborhood, rent } = this.state
@@ -88,8 +90,10 @@ class App extends Component {
   componentDidMount() {
     const myMap = L.map('mapid').setView(
       [49.257482642589025, -123.16407742426055],
-      12
+      13
     )
+
+    myMap.on('zoomend', this.zoomLevelChange)
 
     L.tileLayer(
       `https://api.tiles.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token=${MAPBOX_KEY}`,

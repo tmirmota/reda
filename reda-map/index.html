@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+
+    <!-- Leaflet Styles -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css"
+  integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ=="
+  crossorigin=""/>
+    <!-- Leaflet Script -->
+    <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"
+    integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log=="
+    crossorigin=""></script>
+
+    <link rel="stylesheet" href="./master.css">
+    <script type="text/javascript" src='./shelter-costs.js'></script>
+    <script type="text/javascript" src="./dm-van.js"></script>
+    <script defer type="text/javascript" src="./script.js"></script>
+
+    <title>REDA Maps</title>
+  </head>
+  <body>
+
+    <section class="container-fluid">
+      <div class="row">
+        <div class="col">
+          <h3 id="neighborhood"></h3>
+          <div class="lead">
+            <p id="rent"></p>
+          </div>
+        </div>
+        <div class="col-9 col-map">
+
+          <div id="mapid"></div>
+
+        </div>
+      </div>
+    </seciton>
+
+  </body>
+</html>

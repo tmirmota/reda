@@ -7,12 +7,20 @@ import { data } from './constants/shelter-costs'
 
 import { MAPBOX_KEY } from './constants/apiConstants'
 import { apiFetch } from './utils/apiUtils'
-import { neighborhoodName } from './utils/placeUtils'
-import { getColor } from './utils/styleUtils'
 
 const initialState = {
+<<<<<<< HEAD
   neighborhood: '',
   rent: ''
+=======
+  lat: 49.257482642589025,
+  lng: -123.16407742426055,
+  zoom: 18,
+  name: '',
+  description: '',
+  rent: 0,
+  neighborhood: 'TBA'
+>>>>>>> 16279de... Add hover effect
 }
 
 class App extends Component {
@@ -67,17 +75,18 @@ class App extends Component {
     console.log('zoom level: ', e.target._zoom)
   }
   render() {
-    const { neighborhood, rent } = this.state
+    const { name, description, neighborhood, rent } = this.state
     const rentTitle = `Single Dwelling Rent: $${rent} / month`
 
     return (
       <div className="container-fluid h-100 no-bleed">
         <div className="row h-100">
           <div className="col mt-4">
-            <h3>{neighborhood}</h3>
+            <h3>Name: {name}</h3>
             <hr />
             <div className="lead">
               <p>{rentTitle}</p>
+              <p>{description}</p>
             </div>
           </div>
           <div className="col-9">
@@ -88,28 +97,67 @@ class App extends Component {
     )
   }
   componentDidMount() {
-    const myMap = L.map('mapid').setView(
-      [49.257482642589025, -123.16407742426055],
-      13
-    )
+    const { lng, lat, zoom } = this.state
 
-    myMap.on('zoomend', this.zoomLevelChange)
+    const map = new mapboxgl.Map({
+      container: this.myContainer,
+      style: 'mapbox://styles/tmirmota/cjb1fqagmg2r82srs6d5s9sew',
+      center: [lng, lat],
+      zoom
+    })
 
-    L.tileLayer(
-      `https://api.tiles.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token=${MAPBOX_KEY}`,
-      {
-        attribution:
-          'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-        maxZoom: 18,
-        accessToken: MAPBOX_KEY
-      }
-    ).addTo(myMap)
+    map.on('load', () => {
+      map.addSource('properties', {
+        type: 'vector',
+        url: 'mapbox://tmirmota.69r2qz2u'
+      })
 
-    const dmLayer = L.geoJSON(geoJSONFeature, {
-      style: this.style
-    }).addTo(myMap)
-    dmLayer.on('mouseover', this.mouseOver)
-    dmLayer.on('mouseout', this.mouseOut)
+      const sourceLayer = 'property_parcel_polygonsgeojson'
+
+      map.addLayer({
+        id: 'property-fill',
+        source: 'properties',
+        'source-layer': sourceLayer,
+        type: 'fill',
+        paint: {
+          'fill-opacity': 0.1,
+          'fill-color': '#00ffff',
+          'fill-outline-color': '#ffffff'
+        }
+      })
+
+      map.addLayer({
+        id: 'property-fill-hover',
+        source: 'properties',
+        'source-layer': sourceLayer,
+        type: 'fill',
+        paint: {
+          'fill-opacity': 0.1,
+          'fill-color': '#00ffff'
+        },
+        filter: ['==', 'Name', '']
+      })
+
+      map.on('mousemove', 'property-fill', e => {
+        console.log(e)
+        const { Name, Description } = e.features[0].properties
+        this.setState({ name: Name, description: Description })
+        map.setFilter('property-fill-hover', ['==', 'Name', Name])
+      })
+
+      map.on('mouseleave', 'property-fill', () => {
+        map.setFilter('property-fill-hover', ['==', 'Name', ''])
+      })
+    })
+
+    map.on('move', () => {
+      const { lng, lat } = map.getCenter()
+      this.setState({
+        lng: lng.toFixed(4),
+        lat: lat.toFixed(4),
+        zoom: map.getZoom().toFixed(2)
+      })
+    })
   }
 }
 

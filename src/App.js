@@ -1,81 +1,25 @@
 import React, { Component } from 'react'
-import L from 'leaflet'
+import mapboxgl from 'mapbox-gl'
 
-// Datasets
-import { geoJSONFeature } from './constants/dm-van'
-import { data } from './constants/shelter-costs'
+const tileProperties = 'tmirmota.69r2qz2u'
+const sourceLayer = 'property_parcel_polygonsgeojson'
 
-import { MAPBOX_KEY } from './constants/apiConstants'
-import { apiFetch } from './utils/apiUtils'
+mapboxgl.accessToken =
+  'pk.eyJ1IjoidG1pcm1vdGEiLCJhIjoiY2phenpkeHl1MW5xcTJ2bWsxa2J2c3B1NCJ9.VzfA7MRGj7E8mdTSBdA4Rw'
 
 const initialState = {
-<<<<<<< HEAD
-  neighborhood: '',
-  rent: ''
-=======
   lat: 49.257482642589025,
   lng: -123.16407742426055,
   zoom: 18,
   name: '',
   description: '',
-  rent: 0,
-  neighborhood: 'TBA'
->>>>>>> 16279de... Add hover effect
+  rent: 0
 }
 
 class App extends Component {
   state = initialState
-  mouseOver = async e => {
-    const highlightStyle = {
-      color: '#1de9b6',
-      weight: 3,
-      opacity: 0.6,
-      fillOpacity: 0.65,
-      fillColor: '#1de9b6'
-    }
-
-    e.layer.setStyle(highlightStyle)
-
-    const { layer, latlng } = e
-    const { id } = layer.feature.properties
-    const dm = data.find(({ GeoUID }) => GeoUID === Number(id))
-
-    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${latlng.lng}%2C${latlng.lat}.json?access_token=${MAPBOX_KEY}`
-    const { json } = await apiFetch(url)
-
-    let neighborhood
-
-    if (json) {
-      neighborhood = neighborhoodName(json.features)
-    }
-
-    const rent = dm[
-      'v_CA16_4901: Average monthly shelter costs for rented dwellings ($)'
-    ]
-      .toString()
-      .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-
-    this.setState({ neighborhood, rent })
-  }
-  mouseOut = ({ target, layer }) => {
-    target.resetStyle(layer)
-  }
-  style = feature => {
-    const color = getColor(feature)
-
-    return {
-      fillColor: color,
-      fillOpacity: 0.7,
-      color: '#d1c4e9',
-      opacity: 0.7,
-      weight: 1
-    }
-  }
-  zoomLevelChange = e => {
-    console.log('zoom level: ', e.target._zoom)
-  }
   render() {
-    const { name, description, neighborhood, rent } = this.state
+    const { name, description, rent } = this.state
     const rentTitle = `Single Dwelling Rent: $${rent} / month`
 
     return (
@@ -90,7 +34,10 @@ class App extends Component {
             </div>
           </div>
           <div className="col-9">
-            <div id="mapid" />
+            <div
+              ref={el => (this.mapContainer = el)}
+              className="absolute top right left bottom"
+            />
           </div>
         </div>
       </div>
@@ -100,7 +47,7 @@ class App extends Component {
     const { lng, lat, zoom } = this.state
 
     const map = new mapboxgl.Map({
-      container: this.myContainer,
+      container: this.mapContainer,
       style: 'mapbox://styles/tmirmota/cjb1fqagmg2r82srs6d5s9sew',
       center: [lng, lat],
       zoom
@@ -109,10 +56,8 @@ class App extends Component {
     map.on('load', () => {
       map.addSource('properties', {
         type: 'vector',
-        url: 'mapbox://tmirmota.69r2qz2u'
+        url: `mapbox://${tileProperties}`
       })
-
-      const sourceLayer = 'property_parcel_polygonsgeojson'
 
       map.addLayer({
         id: 'property-fill',

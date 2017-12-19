@@ -13,8 +13,3 @@ body {
 #root {
   height: 100%;
 }
-
-.leaflet-container,
-.main {
-  height: 100%;
-}

@@ -11,13 +11,37 @@ const initialState = {
   zoom: 11,
   name: '',
   description: '',
-  lngLat: null
+  lngLat: null,
+  showZoning: false
 }
 
 class App extends Component {
   state = initialState
+  toggleZoning = ({ target }) => {
+    const { map } = this.state
+    const { name, checked } = target
+
+    if (checked) {
+      map.addLayer({
+        id: 'zoning-fill',
+        source: 'zoning',
+        'source-layer': 'zoning_districtsgeojson',
+        minzoom: 11,
+        maxzoom: 22,
+        type: 'fill',
+        paint: {
+          'fill-opacity': 0.2,
+          'fill-color': '#FFFFFF'
+        }
+      })
+    } else {
+      map.removeLayer('zoning-fill')
+    }
+
+    this.setState({ [name]: checked })
+  }
   render() {
-    const { name, description, lngLat } = this.state
+    const { name, description, lngLat, showZoning } = this.state
 
     return (
       <div className="container-fluid h-100 no-bleed">
@@ -35,6 +59,17 @@ class App extends Component {
                     Lat: {lngLat.lat}
                     <br />Lng: {lngLat.lng}
                   </p>
+                </div>
+                <div>
+                  <label>
+                    Show Zoning:{' '}
+                    <input
+                      name="showZoning"
+                      type="checkbox"
+                      checked={showZoning}
+                      onChange={this.toggleZoning}
+                    />
+                  </label>
                 </div>
               </div>
             )}
@@ -90,55 +125,71 @@ class App extends Component {
           type: 'vector',
           url: 'mapbox://tmirmota.69r2qz2u'
         })
+        .addSource('zoning', {
+          type: 'vector',
+          url: 'mapbox://tmirmota.5h7gkfwq'
+        })
 
       sources.map(({ source, sourceLayer, maxzoom, minzoom }) => {
-        map.addLayer({
-          id: `${source}-fill`,
-          source,
-          'source-layer': sourceLayer,
-          minzoom,
-          maxzoom,
-          type: 'fill',
-          paint: {
-            'fill-opacity': 0.2,
-            'fill-color': fillColor
-          }
-        })
-
-        map.addLayer({
-          id: `${source}-line`,
-          source,
-          'source-layer': sourceLayer,
-          minzoom,
-          maxzoom,
-          type: 'line',
-          paint: {
-            'line-color': '#7986cb'
-          }
-        })
-
-        map.addLayer({
-          id: `${source}-fill-hover`,
-          source,
-          'source-layer': sourceLayer,
-          type: 'fill',
-          paint: {
-            'fill-opacity': 0.5,
-            'fill-color': '#1de9b6'
+        map.addLayer(
+          {
+            id: `${source}-fill`,
+            source,
+            'source-layer': sourceLayer,
+            minzoom,
+            maxzoom,
+            type: 'fill',
+            paint: {
+              'fill-opacity': 0.2,
+              'fill-color': fillColor
+            }
           },
-          filter: ['==', 'Name', '']
-        })
+          'place_label_other'
+        )
 
-        map.addLayer({
-          id: `${source}-line-hover`,
-          source,
-          'source-layer': sourceLayer,
-          type: 'line',
-          paint: {
-            'line-color': '#1de9b6'
+        map.addLayer(
+          {
+            id: `${source}-line`,
+            source,
+            'source-layer': sourceLayer,
+            minzoom,
+            maxzoom,
+            type: 'line',
+            paint: {
+              'line-color': '#7986cb'
+            }
           },
-          filter: ['==', 'Name', '']
-        })
+          'place_label_other'
+        )
+
+        map.addLayer(
+          {
+            id: `${source}-fill-hover`,
+            source,
+            'source-layer': sourceLayer,
+            type: 'fill',
+            paint: {
+              'fill-opacity': 0.5,
+              'fill-color': '#1de9b6'
+            },
+            filter: ['==', 'Name', '']
+          },
+          'place_label_other'
+        )
+
+        map.addLayer(
+          {
+            id: `${source}-line-hover`,
+            source,
+            'source-layer': sourceLayer,
+            type: 'line',
+            paint: {
+              'line-color': '#1de9b6'
+            },
+            filter: ['==', 'Name', '']
+          },
+          'place_label_other'
+        )
 
         map.on('mousemove', `${source}-fill`, e => {
           console.log(e)
@@ -157,6 +208,7 @@ class App extends Component {
         })
         return true
       })
+      this.setState({ map })
     })
 
     map.on('move', () => {

@@ -5,6 +5,25 @@ import './App.css'
 mapboxgl.accessToken =
   'pk.eyJ1IjoidG1pcm1vdGEiLCJhIjoiY2phenpkeHl1MW5xcTJ2bWsxa2J2c3B1NCJ9.VzfA7MRGj7E8mdTSBdA4Rw'
 
+const sources = [
+  {
+    source: 'properties',
+    sourceLayer: 'property_parcel_polygonsgeojson',
+    minzoom: 14,
+    maxzoom: 19,
+    type: 'vector',
+    url: 'tmirmota.69r2qz2u'
+  },
+  {
+    source: 'census-tracts',
+    sourceLayer: 'census_tracts_2016geojson',
+    minzoom: 9,
+    maxzoom: 14,
+    type: 'vector',
+    url: 'tmirmota.4abgvo5b'
+  }
+]
+
 const initialState = {
   lat: 49.25703449385483,
   lng: -123.13180508539645,
@@ -85,28 +104,13 @@ class App extends Component {
     )
   }
   componentDidMount() {
-    const sources = [
-      {
-        source: 'properties',
-        sourceLayer: 'property_parcel_polygonsgeojson',
-        minzoom: 14,
-        maxzoom: 19,
-        type: 'vector',
-        url: 'tmirmota.69r2qz2u'
-      },
-      {
-        source: 'census-tracts',
-        sourceLayer: 'census_tracts_2016geojson',
-        minzoom: 9,
-        maxzoom: 14,
-        type: 'vector',
-        url: 'tmirmota.4abgvo5b'
-      }
-    ]
-
     const { lng, lat, zoom } = this.state
 
     const fillColor = '#3f51b5'
+
+    let start
+    let current
+    let box
 
     const map = new mapboxgl.Map({
       container: this.mapContainer,
@@ -114,6 +118,13 @@ class App extends Component {
       center: [lng, lat],
       zoom
     })
+
+    const popup = new mapboxgl.Popup({
+      closeButton: false
+    })
+
+    // Disable default box zooming.
+    map.boxZoom.disable()
 
     map.on('load', () => {
       map
@@ -130,6 +141,7 @@ class App extends Component {
           url: 'mapbox://tmirmota.5h7gkfwq'
         })
 
+      // Add Base Layers
       sources.map(({ source, sourceLayer, maxzoom, minzoom }) => {
         map.addLayer(
           {
@@ -191,14 +203,46 @@ class App extends Component {
           'place_label_other'
         )
 
+        map.addLayer(
+          {
+            id: `${source}-highlighted`,
+            source,
+            'source-layer': sourceLayer,
+            type: 'line',
+            paint: {
+              'line-color': '#1de9b6'
+            },
+            filter: ['in', 'FIPS', '']
+          },
+          'place_label_other'
+        )
+
         map.on('mousemove', `${source}-fill`, e => {
+          const features = map.queryRenderedFeatures(e.point, {
+            layers: ['properties-highlighted']
+          })
+          // Change the cursor style as a UI indicator.
+          map.getCanvas().style.cursor = features.length ? 'pointer' : ''
+
+          if (!features.length) {
+            popup.remove()
+            return
+          }
+
+          const feature = features[0]
+
+          popup
+            .setLngLat(e.lngLat)
+            .setText(feature.properties.COUNTY)
+            .addTo(map)
+
           console.log(e)
 
-          const { features, lngLat } = e
-          const { Name, Description } = features[0].properties
+          const { lngLat } = e
+          const { Name, Description } = e.features[0].properties
 
           this.setState({ name: Name, description: Description, lngLat })
-          map.setFilter(`${source}-fill-hover`, ['==', 'Name', Name])
+          map.setFilter(`${source}-fille-hover`, ['==', 'Name', Name])
           map.setFilter(`${source}-line-hover`, ['==', 'Name', Name])
         })
 
@@ -208,6 +252,93 @@ class App extends Component {
         })
         return true
       })
+
+      const canvas = map.getCanvasContainer()
+
+      const mousePos = e => {
+        const rect = canvas.getBoundingClientRect()
+        return new mapboxgl.Point(
+          e.clientX - rect.left - canvas.clientLeft,
+          e.clientY - rect.top - canvas.clientTop
+        )
+      }
+
+      const mouseDown = e => {
+        if (!(e.shiftkey && e.button === 0)) return
+
+        map.dragPan.disable()
+
+        document.addEventListener('mousemove', onMouseMove)
+        document.addEventListener('mouseup', onMouseUp)
+        document.addEventListener('onkeydown', onKeyDown)
+
+        start = mousePos(e)
+      }
+
+      canvas.addEventListener('mousedown', mouseDown, true)
+
+      const onMouseMove = e => {
+        current = mousePos(e)
+
+        if (!box) {
+          box = document.createElement('div')
+          box.classList.add('boxdraw')
+          canvas.appendChild(box)
+        }
+        const minX = Math.min(start.x, current.x),
+          maxX = Math.max(start.x, current.x),
+          minY = Math.min(start.y, current.y),
+          maxY = Math.min(start.y, current.y)
+
+        const pos = `translate(${minX}px,${minY}px)`
+
+        box.style.transform = pos
+        box.style.WebkitTransform = pos
+        box.style.width = `${maxX - minX}px`
+        box.style.height = `${maxY - minY}px`
+      }
+
+      const onMouseUp = e => {
+        finish([start, mousePos(e)])
+      }
+
+      const onKeyDown = e => {
+        // If the ESC key is pressed
+        if (e.keyCode === 27) finish()
+      }
+
+      const finish = bbox => {
+        document.removeEventListener('mousemove', onMouseMove)
+        document.removeEventListener('mouseup', onMouseUp)
+        document.removeEventListerner('onkeydown', onKeyDown)
+
+        if (box) {
+          box.parentNode.removeChild(box)
+          box = null
+        }
+
+        if (bbox) {
+          const features = map.queryRenderedFeatures(bbox, {
+            layers: ['properties']
+          })
+
+          if (features.length >= 1000) {
+            return window.alert('Select a smaller number of properties')
+          }
+
+          const filter = features.reduce(
+            (memo, feature) => {
+              memo.push(feature.properties.FIPS)
+              return memo
+            },
+            ['in', 'FIPS']
+          )
+
+          map.setFilter('properties-highlighted', filter)
+        }
+        map.dragPan.enable()
+      }
+
       this.setState({ map })
     })
 

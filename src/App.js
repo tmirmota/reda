@@ -223,7 +223,8 @@ class App extends Component {
     })
 
     map.addControl(new MapboxGeocoder({
-    accessToken: mapboxgl.accessToken
+    accessToken: mapboxgl.accessToken,
+    country: 'ca'
     }));
 
     map.on('load', () => {

@@ -27,16 +27,41 @@ const sources = [
 ]
 
 const initialState = {
-  lat: 49.25703449385483,
-  lng: -123.13180508539645,
-  zoom: 11,
+  lat: 49.26938985956605,
+  lng: -123.14345477018412,
+  zoom: 17,
   properties: null,
   lngLat: null,
   showZoning: false,
+  folio: null,
+  propertyDetails: null,
+  propertyAddress: null
 }
 
 class App extends Component {
+  requestProperty = async newFolio => {
+    const { folio } = this.state
+
+    if (folio !== newFolio) {
+      const { json } = await fetch(
+        `https://reda-188106.appspot.com/property/${newFolio}`
+      )
+        .then(res => res.json())
+        .then(json => ({ json }))
+        .catch(err => console.log(err))
+
+      if (json) {
+        console.log(json)
+        this.setState({ folio: newFolio, propertyDetails: json[0] })
+      } else {
+        this.setState({ folio: newFolio })
+      }
+    }
+  }
   state = initialState
+  componentWillMount() {
+    this.requestProperty(739184050000)
+  }
   toggleZoning = ({ target }) => {
     const { map } = this.state
     const { name, checked } = target
@@ -62,21 +87,90 @@ class App extends Component {
     this.setState({ [name]: checked })
   }
   render() {
-    const { properties, lngLat, showZoning, zone } = this.state
+    const {
+      properties,
+      lngLat,
+      showZoning,
+      zone,
+      propertyDetails,
+      propertyAddress
+    } = this.state
 
-    const keys = properties ? Object.keys(properties) : []
+    const propertiesKeys = properties ? Object.keys(properties) : []
 
     return (
       <div className="container-fluid h-100 no-bleed">
         <div className="row h-100">
-          <div className="col pt-4 sidebar">
+          <div className="col-2 pt-4 sidebar">
             {lngLat && (
               <div>
                 <div>
-                  {keys.map((key, id) => (<div key={id}>
-                    <p>{key}: {properties[key]}</p>
-                  </div>))}
-                  {zone ? <p>Zone: <a href={zone.url} target="_blank">{zone.name}</a></p> : ''}
+                  <div>
+                    {propertyAddress ? (
+                      <strong>
+                        {propertyAddress.number} {propertyAddress.street}
+                      </strong>
+                    ) : (
+                      ''
+                    )}
+                    <div>Yaletown</div>
+                  </div>
+                  <hr />
+                  {propertyDetails && (
+                    <div>
+                      <div>
+                        <strong className="text-uppercase">Assessment</strong>
+                        <div>
+                          <span>Land Value: </span>
+                          <span>
+                            ${propertyDetails['CURRENT_LAND_VALUE']
+                              .toString()
+                              .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                          </span>
+                        </div>
+                        <div>
+                          <span>Improvement Value: </span>
+                          <span>
+                            ${propertyDetails['CURRENT_IMPROVEMENT_VALUE']
+                              .toString()
+                              .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                          </span>
+                        </div>
+                        <div>
+                          <span>Year Built: </span>
+                          <span>{propertyDetails['YEAR_BUILT']}</span>
+                        </div>
+                      </div>
+                      <hr />
+                      <div>
+                        <strong className="text-uppercase">Zoning</strong>
+                        <div>
+                          {zone ? (
+                            <a href={zone.url} target="_blank">
+                              {zone.name}
+                            </a>
+                          ) : (
+                            ''
+                          )}
+                        </div>
+                        <div>{propertyDetails['ZONE_CATEGORY']}</div>
+                        <div>
+                          <span>Legal Type: </span>
+                          <span className="text-capitalize">
+                            {propertyDetails['LEGAL_TYPE']}
+                          </span>
+                        </div>
+                      </div>
+                      <hr />
+                    </div>
+                  )}
+                  {propertiesKeys.map((key, id) => (
+                    <div key={id}>
+                      <p>
+                        {key}: {properties[key]}
+                      </p>
+                    </div>
+                  ))}
                   <p>
                     Lat: {lngLat.lat}
                     <br />Lng: {lngLat.lng}
@@ -133,18 +227,18 @@ class App extends Component {
           url: 'mapbox://tmirmota.5h7gkfwq'
         })
 
-        map.addLayer({
-          id: 'zoning-fill2',
-          source: 'zoning',
-          'source-layer': 'zoning_districtsgeojson',
-          minzoom: 11,
-          maxzoom: 22,
-          type: 'fill',
-          paint: {
-            'fill-opacity': 0.0,
-            'fill-color': '#FFFFFF',
-          }
-        })
+      map.addLayer({
+        id: 'zoning-fill2',
+        source: 'zoning',
+        'source-layer': 'zoning_districtsgeojson',
+        minzoom: 11,
+        maxzoom: 22,
+        type: 'fill',
+        paint: {
+          'fill-opacity': 0.0,
+          'fill-color': '#FFFFFF'
+        }
+      })
 
       sources.map(({ source, sourceLayer, maxzoom, minzoom, filter }) => {
         map.addLayer(
@@ -208,30 +302,64 @@ class App extends Component {
         )
 
         map.on('mousemove', `${source}-fill`, e => {
-
           const feature = e.features[0]
 
           const { source } = feature.layer
 
           let zone
           if (source === 'properties') {
-            const zoneFeatures = map.queryRenderedFeatures(e.point, { layers: [ 'zoning-fill2']})
+            const { Description } = feature.properties
+            const indexCivicNum = Description.indexOf('CIVIC_NUMBER:')
+            const indexStdStreet = Description.indexOf('STD_STREET:')
+            const indexPcoord = Description.indexOf('PCOORD:')
+            const indexSiteId = Description.indexOf('SITE_ID:')
+            const pcoord = Description.substring(
+              indexPcoord + 7,
+              indexSiteId - 1
+            )
+
+            const folio = pcoord * Math.pow(10, 12 - pcoord.length)
+            const streetNumber = Description.substring(
+              indexCivicNum + 13,
+              indexStdStreet - 1
+            )
+            const streetName = Description.substring(
+              indexStdStreet + 11,
+              indexPcoord - 1
+            )
+
+            const propertyAddress = {
+              number: streetNumber,
+              street: streetName
+            }
+
+            this.requestProperty(folio)
+
+            const zoneFeatures = map.queryRenderedFeatures(e.point, {
+              layers: ['zoning-fill2']
+            })
             if (zoneFeatures) {
               const { Name, Description } = zoneFeatures[0].properties
               const urlStart = Description.indexOf('zone_url') + 18
-              const urlEnd = Description.substring(urlStart).indexOf('</td>') + urlStart
+              const urlEnd =
+                Description.substring(urlStart).indexOf('</td>') + urlStart
               const url = Description.substring(urlStart, urlEnd)
               zone = { name: Name, url }
             }
+            this.setState({ propertyAddress })
           } else if (source === 'census-tracts') {
-            console.log(e);
+            console.log(e)
           }
 
           const filterName = feature.properties[filter]
           map.setFilter(`${source}-fill-hover`, ['==', filter, filterName])
           map.setFilter(`${source}-line-hover`, ['==', filter, filterName])
 
-          this.setState({ properties: feature.properties, lngLat: e.lngLat, zone })
+          this.setState({
+            properties: feature.properties,
+            lngLat: e.lngLat,
+            zone
+          })
         })
 
         map.on('mouseleave', `${source}-fill`, () => {

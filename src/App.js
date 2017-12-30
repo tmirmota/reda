@@ -1,6 +1,11 @@
 import React, { Component } from 'react'
 import mapboxgl from 'mapbox-gl'
+import MapboxGeocoder from 'mapbox-gl-geocoder'
 import './App.css'
+
+import {withStyles} from 'material-ui/styles'
+import Switch from 'material-ui/Switch'
+import Button from 'material-ui/Button'
 
 mapboxgl.accessToken =
   'pk.eyJ1IjoidG1pcm1vdGEiLCJhIjoiY2phenpkeHl1MW5xcTJ2bWsxa2J2c3B1NCJ9.VzfA7MRGj7E8mdTSBdA4Rw'
@@ -27,22 +32,32 @@ const sources = [
 ]
 
 const initialState = {
-  lat: 49.26938985956605,
-  lng: -123.14345477018412,
+  lat: 49.26954442245676,
+  lng: -123.15633664293384,
   zoom: 17,
   properties: null,
   lngLat: null,
   showZoning: false,
   folio: null,
   propertyDetails: null,
-  propertyAddress: null
+  propertyAddress: null,
+  selectedProperty: null
+}
+
+const styles = {
+  switch: {height: '75%'},
 }
 
 class App extends Component {
+  state = initialState
+  componentWillMount() {
+    this.requestProperty(739184050000)
+  }
   requestProperty = async newFolio => {
     const { folio } = this.state
 
     if (folio !== newFolio) {
+      this.setState({ folio: newFolio})
       const { json } = await fetch(
         `https://reda-188106.appspot.com/property/${newFolio}`
       )
@@ -51,20 +66,14 @@ class App extends Component {
         .catch(err => console.log(err))
 
       if (json) {
-        console.log(json)
-        this.setState({ folio: newFolio, propertyDetails: json[0] })
+        this.setState({ propertyDetails: json[0] })
       } else {
-        this.setState({ folio: newFolio })
+        return false
       }
     }
   }
-  state = initialState
-  componentWillMount() {
-    this.requestProperty(739184050000)
-  }
-  toggleZoning = ({ target }) => {
+  toggleZoning = name => (event, checked) => {
     const { map } = this.state
-    const { name, checked } = target
 
     if (checked) {
       map.addLayer({
@@ -86,17 +95,23 @@ class App extends Component {
 
     this.setState({ [name]: checked })
   }
+  removeSelection = () => {
+    const { selectedProperty, map } = this.state
+    const { layer, filter } = selectedProperty
+    map.setFilter(layer, ['==', filter, ''])
+    this.setState({ selectedProperty: null})
+  }
   render() {
     const {
-      properties,
       lngLat,
       showZoning,
       zone,
       propertyDetails,
-      propertyAddress
+      propertyAddress,
+      selectedProperty
     } = this.state
 
-    const propertiesKeys = properties ? Object.keys(properties) : []
+    const { classes } = this.props
 
     return (
       <div className="container-fluid h-100 no-bleed">
@@ -122,7 +137,7 @@ class App extends Component {
                         <strong className="text-uppercase">Assessment</strong>
                         <div>
                           <span>Land Value: </span>
-                          <span>
+                          <span className='float-right'>
                             ${propertyDetails['CURRENT_LAND_VALUE']
                               .toString()
                               .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
@@ -130,7 +145,7 @@ class App extends Component {
                         </div>
                         <div>
                           <span>Improvement Value: </span>
-                          <span>
+                          <span className="float-right">
                             ${propertyDetails['CURRENT_IMPROVEMENT_VALUE']
                               .toString()
                               .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
@@ -138,12 +153,19 @@ class App extends Component {
                         </div>
                         <div>
                           <span>Year Built: </span>
-                          <span>{propertyDetails['YEAR_BUILT']}</span>
+                          <span className="float-right">{propertyDetails['YEAR_BUILT']}</span>
                         </div>
                       </div>
                       <hr />
                       <div>
-                        <strong className="text-uppercase">Zoning</strong>
+                          <strong className="text-uppercase">Zoning</strong>
+                          <span className="float-right">
+                            <Switch
+                              checked={showZoning}
+                              onChange={this.toggleZoning('showZoning')}
+                              classes={{default: classes.switch}}
+                            />
+                          </span>
                         <div>
                           {zone ? (
                             <a href={zone.url} target="_blank">
@@ -164,28 +186,16 @@ class App extends Component {
                       <hr />
                     </div>
                   )}
-                  {propertiesKeys.map((key, id) => (
-                    <div key={id}>
-                      <p>
-                        {key}: {properties[key]}
-                      </p>
-                    </div>
-                  ))}
-                  <p>
+                  {selectedProperty && <div className="text-center">
+                    <Button color="accent" onClick={this.removeSelection}>
+                      Remove Selection
+                    </Button>
+                  </div>}
+                  <p className="text-muted">
                     Lat: {lngLat.lat}
                     <br />Lng: {lngLat.lng}
                   </p>
-                </div>
-                <div>
-                  <label>
-                    Show Zoning:{' '}
-                    <input
-                      name="showZoning"
-                      type="checkbox"
-                      checked={showZoning}
-                      onChange={this.toggleZoning}
-                    />
-                  </label>
+
                 </div>
               </div>
             )}
@@ -211,6 +221,10 @@ class App extends Component {
       center: [lng, lat],
       zoom
     })
+
+    map.addControl(new MapboxGeocoder({
+    accessToken: mapboxgl.accessToken
+    }));
 
     map.on('load', () => {
       map
@@ -301,7 +315,43 @@ class App extends Component {
           'place_label_other'
         )
 
+        map.addLayer(
+          {
+            id: `${source}-fill-click`,
+            source,
+            'source-layer': sourceLayer,
+            type: 'fill',
+            paint: {
+              'fill-color': '#e9291d'
+            },
+            filter: ['==', filter, '']
+          },
+          'place_label_other'
+        )
+
+        map.on('click', `properties-fill`, e => {
+          console.log('Selected Property', e);
+          const feature = e.features[0]
+
+          const filterName = feature.properties[filter]
+          const layer = `${source}-fill-click`
+          if (filterName) {
+            map.setFilter(layer, ['==', filter, filterName])
+            const selectedProperty = {
+              filter,
+              layer
+            }
+            this.setState({ selectedProperty })
+          }
+
+        })
+
         map.on('mousemove', `${source}-fill`, e => {
+          if (this.state.selectedProperty) {
+            console.log('Property is already selected');
+            return false
+          }
+
           const feature = e.features[0]
 
           const { source } = feature.layer
@@ -338,7 +388,7 @@ class App extends Component {
             const zoneFeatures = map.queryRenderedFeatures(e.point, {
               layers: ['zoning-fill2']
             })
-            if (zoneFeatures) {
+            if (zoneFeatures[0]) {
               const { Name, Description } = zoneFeatures[0].properties
               const urlStart = Description.indexOf('zone_url') + 18
               const urlEnd =
@@ -348,7 +398,6 @@ class App extends Component {
             }
             this.setState({ propertyAddress })
           } else if (source === 'census-tracts') {
-            console.log(e)
           }
 
           const filterName = feature.properties[filter]
@@ -383,4 +432,4 @@ class App extends Component {
   }
 }
 
-export default App
+export default withStyles(styles)(App)

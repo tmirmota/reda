@@ -397,10 +397,26 @@ class App extends Component {
                             <em>{propertyDetails['TAX_ASSESSMENT_YEAR']}</em>
                           </span>
                         </div>
+                        <strong>
+                          <span>Total Value</span>
+                          <span className="float-right">
+                            ${(propertyDetails['CURRENT_LAND_VALUE'] + propertyDetails['CURRENT_IMPROVEMENT_VALUE'])
+                              .toString()
+                              .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                          </span>
+                        </strong>
                         <div>
-                          <span>Land Value </span>
+                          <span>Land</span>
                           <span className="float-right">
                             ${propertyDetails['CURRENT_LAND_VALUE']
+                              .toString()
+                              .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                          </span>
+                        </div>
+                        <div>
+                          <span>Building</span>
+                          <span className="float-right">
+                            ${propertyDetails['CURRENT_IMPROVEMENT_VALUE']
                               .toString()
                               .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                           </span>
@@ -409,14 +425,6 @@ class App extends Component {
                           <span className="text-muted">Prev. Land Value </span>
                           <span className="float-right text-muted">
                             ${propertyDetails['PREVIOUS_LAND_VALUE']
-                              .toString()
-                              .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                          </span>
-                        </div>
-                        <div>
-                          <span>Improvement Value </span>
-                          <span className="float-right">
-                            ${propertyDetails['CURRENT_IMPROVEMENT_VALUE']
                               .toString()
                               .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                           </span>
@@ -510,7 +518,8 @@ class App extends Component {
     map.addControl(
       new MapboxGeocoder({
         accessToken: mapboxgl.accessToken,
-        country: 'ca'
+        country: 'ca',
+        placeholder: 'Search address, street, neighborhood or city'
       })
     )
 

@@ -35,8 +35,8 @@ const sources = [
 ]
 
 const initialState = {
-  lat: 49.26954442245676,
-  lng: -123.15633664293384,
+  lat: 49.2532,
+  lng: -123.1113,
   zoom: 17,
   properties: null,
   lngLat: null,
@@ -76,17 +76,12 @@ class App extends Component {
       this.setState({ neighborhood, place })
     }
   }
-  requestProperty = async newFolio => {
-    const { folio } = this.state
+  requestProperty = async newPcoord => {
+    const { pcoord } = this.state
 
-    if (folio !== newFolio) {
-      this.setState({ folio: newFolio})
-      const { json } = await fetch(
-        `https://reda-188106.appspot.com/property/${newFolio}`
-      )
-        .then(res => res.json())
-        .then(json => ({ json }))
-        .catch(err => console.log(err))
+    if (pcoord !== newPcoord) {
+      this.setState({ pcoord: newPcoord})
+      const { json } = await apiFetch(`https://reda-188106.appspot.com/land-coordinate/${newPcoord}`)
 
       if (json) {
         this.setState({ propertyDetails: json[0] })
@@ -282,7 +277,6 @@ class App extends Component {
             indexSiteId - 1
           )
 
-          const folio = pcoord * Math.pow(10, 12 - pcoord.length)
           const streetNumber = Description.substring(
             indexCivicNum + 13,
             indexStdStreet - 1
@@ -297,7 +291,7 @@ class App extends Component {
             street: streetName
           }
 
-          this.requestProperty(folio)
+          this.requestProperty(pcoord)
 
           const zoneFeatures = map.queryRenderedFeatures(e.point, {
             layers: ['zoning-fill2']
@@ -350,8 +344,6 @@ class App extends Component {
 
     const { classes } = this.props
 
-    console.log(window.innerWidth <= 768);
-
     if (window.innerWidth <= 768) {
       return (
         <div className='container text-center mt-2'>
@@ -372,21 +364,42 @@ class App extends Component {
                 <div>
                   <div>
                     {propertyAddress ? (
-                      <strong>
+                      <div className='lead'>
                         {propertyAddress.number} {propertyAddress.street}
-                      </strong>
+                      </div>
                     ) : (
                       ''
                     )}
-                    <div className="text-muted"><span className="lead">{neighborhood}{neighborhood && place && ', '}</span>{place}</div>
+                    <div className="text-muted">{neighborhood}{neighborhood && place && ', '}{place}</div>
                   </div>
                   <hr />
                   {propertyDetails && (
                     <div>
                       <div>
-                        <strong className="text-uppercase">Assessment</strong>
+                        <div  className="sidebar-heading">
+                          <strong className="text-uppercase">Property Details</strong>
+                        </div>
                         <div>
-                          <span>Land Value: </span>
+                          <span>Year Built </span>
+                          <span className="float-right">{propertyDetails['YEAR_BUILT']}</span>
+                        </div>
+                        <div>
+                          <span>Property Taxes </span>
+                          <span className='float-right'>
+                            ${propertyDetails['TAX_LEVY']
+                              .toString()
+                              .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                          </span>
+                        </div>
+                      </div>
+                      <hr />
+                      <div>
+                        <div className="sidebar-heading">
+                          <strong className="text-uppercase">Assessment</strong>
+                          <span className="float-right text-muted"><em>{propertyDetails['TAX_ASSESSMENT_YEAR']}</em></span>
+                        </div>
+                        <div>
+                          <span>Land Value </span>
                           <span className='float-right'>
                             ${propertyDetails['CURRENT_LAND_VALUE']
                               .toString()
@@ -394,7 +407,15 @@ class App extends Component {
                           </span>
                         </div>
                         <div>
-                          <span>Improvement Value: </span>
+                          <span className="text-muted">Prev. Land Value </span>
+                          <span className="float-right text-muted">
+                            ${propertyDetails['PREVIOUS_LAND_VALUE']
+                              .toString()
+                              .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                          </span>
+                        </div>
+                        <div>
+                          <span>Improvement Value </span>
                           <span className="float-right">
                             ${propertyDetails['CURRENT_IMPROVEMENT_VALUE']
                               .toString()
@@ -402,20 +423,26 @@ class App extends Component {
                           </span>
                         </div>
                         <div>
-                          <span>Year Built: </span>
-                          <span className="float-right">{propertyDetails['YEAR_BUILT']}</span>
+                          <span className='text-muted'>Big Improvement Year</span>
+                          <span className='float-right text-muted'>
+                            {propertyDetails['BIG_IMPROVEMENT_YEAR']}
+                          </span>
                         </div>
                       </div>
                       <hr />
                       <div>
-                          <strong className="text-uppercase">Zoning</strong>
-                          <span className="float-right">
-                            <Switch
-                              checked={showZoning}
-                              onChange={this.toggleZoning('showZoning')}
-                              classes={{default: classes.switch}}
-                            />
-                          </span>
+                        <div>
+                          <div className="sidebar-heading">
+                            <strong className="text-uppercase">Zoning</strong>
+                            <span className="float-right">
+                              <Switch
+                                checked={showZoning}
+                                onChange={this.toggleZoning('showZoning')}
+                                classes={{default: classes.switch}}
+                              />
+                            </span>
+                          </div>
+                        </div>
                         <div>
                           {zone ? (
                             <a href={zone.url} target="_blank">
@@ -436,11 +463,6 @@ class App extends Component {
                       <hr />
                     </div>
                   )}
-                  {selectedProperty && <div className="text-center">
-                    <Button color="accent" onClick={this.removeSelection}>
-                      Remove Selection
-                    </Button>
-                  </div>}
                   <FormControlLabel
                     control={
                       <Switch
@@ -450,7 +472,11 @@ class App extends Component {
                     }
                     label="Satellite"
                   />
-
+                  {selectedProperty && <div className="text-center">
+                    <Button color="accent" onClick={this.removeSelection}>
+                      Remove Selection
+                    </Button>
+                  </div>}
                 </div>
               </div>
             )}
@@ -469,10 +495,7 @@ class App extends Component {
 
   componentDidMount() {
 
-    if (window.innerWidth <= 768) {
-      return false
-    }
-
+    if (window.innerWidth <= 768) return false
 
     const { lng, lat, zoom } = this.state
 

@@ -3,7 +3,7 @@ import mapboxgl from 'mapbox-gl'
 import MapboxGeocoder from 'mapbox-gl-geocoder'
 import './App.css'
 
-import {withStyles} from 'material-ui/styles'
+import { withStyles } from 'material-ui/styles'
 import Switch from 'material-ui/Switch'
 import Button from 'material-ui/Button'
 import { FormControlLabel } from 'material-ui/Form'
@@ -51,7 +51,7 @@ const initialState = {
 }
 
 const styles = {
-  switch: {height: '75%'},
+  switch: { height: '75%' }
 }
 
 class App extends Component {
@@ -67,9 +67,9 @@ class App extends Component {
       let place
       json.features.map(feature => {
         const type = feature.place_type[0]
-        if (type === "neighborhood") {
+        if (type === 'neighborhood') {
           neighborhood = feature.text
-        } else if (type === "place") {
+        } else if (type === 'place') {
           place = feature.text
         }
       })
@@ -80,8 +80,10 @@ class App extends Component {
     const { pcoord } = this.state
 
     if (pcoord !== newPcoord) {
-      this.setState({ pcoord: newPcoord})
-      const { json } = await apiFetch(`https://reda-188106.appspot.com/land-coordinate/${newPcoord}`)
+      this.setState({ pcoord: newPcoord })
+      const { json } = await apiFetch(
+        `https://reda-188106.appspot.com/land-coordinate/${newPcoord}`
+      )
 
       if (json) {
         this.setState({ propertyDetails: json[0] })
@@ -102,7 +104,7 @@ class App extends Component {
         maxzoom: 22,
         type: 'line',
         paint: {
-          'line-color': '#f412da',
+          'line-color': '#f412da'
         }
       })
     } else {
@@ -115,7 +117,7 @@ class App extends Component {
     const { selectedProperty, map } = this.state
     const { layer, filter } = selectedProperty
     map.setFilter(layer, ['==', filter, ''])
-    this.setState({ selectedProperty: null})
+    this.setState({ selectedProperty: null })
   }
   toggleSatellite = (event, checked) => {
     const { map } = this.state
@@ -138,7 +140,7 @@ class App extends Component {
         })
       }
     })
-    this.setState({ satellite: checked})
+    this.setState({ satellite: checked })
   }
   addSources = map => {
     map
@@ -174,73 +176,63 @@ class App extends Component {
     })
 
     sources.map(({ source, sourceLayer, maxzoom, minzoom, filter }) => {
-      map.addLayer(
-        {
-          id: `${source}-fill`,
-          source,
-          'source-layer': sourceLayer,
-          minzoom,
-          maxzoom,
-          type: 'fill',
-          paint: {
-            'fill-opacity': 0.2,
-            'fill-color': fillColor
-          }
+      map.addLayer({
+        id: `${source}-fill`,
+        source,
+        'source-layer': sourceLayer,
+        minzoom,
+        maxzoom,
+        type: 'fill',
+        paint: {
+          'fill-opacity': 0.2,
+          'fill-color': fillColor
         }
-      )
-      map.addLayer(
-        {
-          id: `${source}-line`,
-          source,
-          'source-layer': sourceLayer,
-          minzoom,
-          maxzoom,
-          type: 'line',
-          paint: {
-            'line-color': '#7986cb'
-          }
+      })
+      map.addLayer({
+        id: `${source}-line`,
+        source,
+        'source-layer': sourceLayer,
+        minzoom,
+        maxzoom,
+        type: 'line',
+        paint: {
+          'line-color': '#7986cb'
         }
-      )
-      map.addLayer(
-        {
-          id: `${source}-fill-hover`,
-          source,
-          'source-layer': sourceLayer,
-          type: 'fill',
-          paint: {
-            'fill-opacity': 0.5,
-            'fill-color': '#1de9b6'
-          },
-          filter: ['==', filter, '']
-        }
-      )
-      map.addLayer(
-        {
-          id: `${source}-line-hover`,
-          source,
-          'source-layer': sourceLayer,
-          type: 'line',
-          paint: {
-            'line-color': '#1de9b6'
-          },
-          filter: ['==', filter, '']
-        }
-      )
-      map.addLayer(
-        {
-          id: `${source}-fill-click`,
-          source,
-          'source-layer': sourceLayer,
-          type: 'fill',
-          paint: {
-            'fill-color': '#e9291d'
-          },
-          filter: ['==', filter, '']
-        }
-      )
+      })
+      map.addLayer({
+        id: `${source}-fill-hover`,
+        source,
+        'source-layer': sourceLayer,
+        type: 'fill',
+        paint: {
+          'fill-opacity': 0.5,
+          'fill-color': '#1de9b6'
+        },
+        filter: ['==', filter, '']
+      })
+      map.addLayer({
+        id: `${source}-line-hover`,
+        source,
+        'source-layer': sourceLayer,
+        type: 'line',
+        paint: {
+          'line-color': '#1de9b6'
+        },
+        filter: ['==', filter, '']
+      })
+      map.addLayer({
+        id: `${source}-fill-click`,
+        source,
+        'source-layer': sourceLayer,
+        type: 'fill',
+        paint: {
+          'fill-color': '#e9291d'
+        },
+        filter: ['==', filter, '']
+      })
 
       map.on('click', `properties-fill`, e => {
-        console.log('Selected Property', e);
+        console.log('Selected Property', e)
         const feature = e.features[0]
 
         const filterName = feature.properties[filter]
@@ -253,11 +245,10 @@ class App extends Component {
           }
           this.setState({ selectedProperty })
         }
-
       })
       map.on('mousemove', `${source}-fill`, e => {
         if (this.state.selectedProperty) {
-          console.log('Property is already selected');
+          console.log('Property is already selected')
           return false
         }
 
@@ -272,10 +263,7 @@ class App extends Component {
           const indexStdStreet = Description.indexOf('STD_STREET:')
           const indexPcoord = Description.indexOf('PCOORD:')
           const indexSiteId = Description.indexOf('SITE_ID:')
-          const pcoord = Description.substring(
-            indexPcoord + 7,
-            indexSiteId - 1
-          )
+          const pcoord = Description.substring(indexPcoord + 7, indexSiteId - 1)
 
           const streetNumber = Description.substring(
             indexCivicNum + 13,
@@ -301,7 +289,7 @@ class App extends Component {
             const urlStart = Description.indexOf('zone_url') + 18
             const urlEnd =
               Description.substring(urlStart).indexOf('</td>') + urlStart
-            const url = Description.substring(urlStart, urlEnd)
+            const url = `http://bylaws.vancouver.ca/zoning/${Name}.pdf`
             zone = { name: Name, url }
           }
           this.setState({ propertyAddress })
@@ -346,10 +334,11 @@ class App extends Component {
 
     if (window.innerWidth <= 768) {
       return (
-        <div className='container text-center mt-2'>
+        <div className="container text-center mt-2">
           <h2>Head to your nearest desktop computer!</h2>
           <p>
-            Sorry, Reda's interface isn't quite ready for mobile devices like yours.
+            Sorry, Reda's interface isn't quite ready for mobile devices like
+            yours.
           </p>
         </div>
       )
@@ -364,28 +353,36 @@ class App extends Component {
                 <div>
                   <div>
                     {propertyAddress ? (
-                      <div className='lead'>
+                      <div className="lead">
                         {propertyAddress.number} {propertyAddress.street}
                       </div>
                     ) : (
                       ''
                     )}
-                    <div className="text-muted">{neighborhood}{neighborhood && place && ', '}{place}</div>
+                    <div className="text-muted">
+                      {neighborhood}
+                      {neighborhood && place && ', '}
+                      {place}
+                    </div>
                   </div>
                   <hr />
                   {propertyDetails && (
                     <div>
                       <div>
-                        <div  className="sidebar-heading">
-                          <strong className="text-uppercase">Property Details</strong>
+                        <div className="sidebar-heading">
+                          <strong className="text-uppercase">
+                            Property Details
+                          </strong>
                         </div>
                         <div>
                           <span>Year Built </span>
-                          <span className="float-right">{propertyDetails['YEAR_BUILT']}</span>
+                          <span className="float-right">
+                            {propertyDetails['YEAR_BUILT']}
+                          </span>
                         </div>
                         <div>
                           <span>Property Taxes </span>
-                          <span className='float-right'>
+                          <span className="float-right">
                             ${propertyDetails['TAX_LEVY']
                               .toString()
                               .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
@@ -396,11 +393,13 @@ class App extends Component {
                       <div>
                         <div className="sidebar-heading">
                           <strong className="text-uppercase">Assessment</strong>
-                          <span className="float-right text-muted"><em>{propertyDetails['TAX_ASSESSMENT_YEAR']}</em></span>
+                          <span className="float-right text-muted">
+                            <em>{propertyDetails['TAX_ASSESSMENT_YEAR']}</em>
+                          </span>
                         </div>
                         <div>
                           <span>Land Value </span>
-                          <span className='float-right'>
+                          <span className="float-right">
                             ${propertyDetails['CURRENT_LAND_VALUE']
                               .toString()
                               .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
@@ -423,8 +422,10 @@ class App extends Component {
                           </span>
                         </div>
                         <div>
-                          <span className='text-muted'>Big Improvement Year</span>
-                          <span className='float-right text-muted'>
+                          <span className="text-muted">
+                            Big Improvement Year
+                          </span>
+                          <span className="float-right text-muted">
                             {propertyDetails['BIG_IMPROVEMENT_YEAR']}
                           </span>
                         </div>
@@ -438,7 +439,7 @@ class App extends Component {
                               <Switch
                                 checked={showZoning}
                                 onChange={this.toggleZoning('showZoning')}
-                                classes={{default: classes.switch}}
+                                classes={{ default: classes.switch }}
                               />
                             </span>
                           </div>
@@ -472,11 +473,13 @@ class App extends Component {
                     }
                     label="Satellite"
                   />
-                  {selectedProperty && <div className="text-center">
-                    <Button color="accent" onClick={this.removeSelection}>
-                      Remove Selection
-                    </Button>
-                  </div>}
+                  {selectedProperty && (
+                    <div className="text-center">
+                      <Button color="accent" onClick={this.removeSelection}>
+                        Remove Selection
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -492,26 +495,24 @@ class App extends Component {
     )
   }
 
-
   componentDidMount() {
-
     if (window.innerWidth <= 768) return false
 
     const { lng, lat, zoom } = this.state
 
-
     const map = new mapboxgl.Map({
       container: this.mapContainer,
-      // style: 'mapbox://styles/tmirmota/cjb1fqagmg2r82srs6d5s9sew',
       style: 'mapbox://styles/mapbox/basic-v9',
       center: [lng, lat],
       zoom
     })
 
-    map.addControl(new MapboxGeocoder({
-    accessToken: mapboxgl.accessToken,
-    country: 'ca'
-    }));
+    map.addControl(
+      new MapboxGeocoder({
+        accessToken: mapboxgl.accessToken,
+        country: 'ca'
+      })
+    )
 
     map.on('load', () => {
       this.renderLayers(map)

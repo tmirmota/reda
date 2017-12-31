@@ -1,4 +1,7 @@
 .sidebar {
   box-shadow: 0 0 10px 2px rgba(31, 51, 73, 0.1);
   z-index: 10;
+  min-width: 240px !important;
+  max-width: 240px !important;
+  overflow-y: scroll;
 }

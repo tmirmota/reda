@@ -26,56 +26,73 @@ mapboxgl.accessToken = mapboxAccessToken
 class App extends Component {
   state = initialState
   reverseGeocode = async () => {
-    const { lng, lat, property } = this.state
+    const { lng, lat } = this.state
     const url = `${hostMapbox}/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${mapboxgl.accessToken}`
     const { json } = await apiFetch(url)
     if (json) {
       let neighborhood
-      let place
+      let city
 
       json.features.map(feature => {
         const type = feature.place_type[0]
         if (type === 'neighborhood') return (neighborhood = feature.text)
-        if (type === 'place') return (place = feature.text)
+        if (type === 'place') return (city = feature.text)
+        return true
       })
 
-      property['neighborhood'] = neighborhood
-      property['city'] = place
-
-      this.setState({ property })
+      this.setState(prevState => ({ property: { ...prevState.property, neighborhood, city } }))
     }
   }
-  requestProperty = async newPcoord => {
-    const { property } = this.state
-    if (Number(property.pcoord) !== newPcoord) {
-      property['pcoord'] = newPcoord
-      this.setState({ property })
+  requestProperty = async pcoord => {
+    const url = `${hostReda}/land-coordinate/${pcoord}`
+    const { json } = await apiFetch(url)
 
-      const url = `${hostReda}/land-coordinate/${newPcoord}`
-      const { json } = await apiFetch(url)
+    if (json) {
+      const yearBuilt = json[0]['YEAR_BUILT']
+      const propertyTax = json[0]['TAX_LEVY']
+      const assessmentYear = json[0]['TAX_ASSESSMENT_YEAR']
+      const landAssessment = json[0]['CURRENT_LAND_VALUE']
+      const buildingAssessment = json[0]['CURRENT_IMPROVEMENT_VALUE']
+      const prevLandAssessment = json[0]['PREVIOUS_LAND_VALUE']
+      const bigImprovYear = json[0]['BIG_IMPROVEMENT_YEAR']
+      const zone = json[0]['ZONE_NAME']
+      const zoneCategory = json[0]['ZONE_CATEGORY']
+      const legalType = json[0]['LEGAL_TYPE']
+      const totalAssessment = landAssessment + buildingAssessment
 
-      if (json) {
-        property['yearBuilt'] = json[0]['YEAR_BUILT']
-        property['propertyTax'] = json[0]['TAX_LEVY']
-        property['assessmentYear'] = json[0]['TAX_ASSESSMENT_YEAR']
-        property['landAssessment'] = json[0]['CURRENT_LAND_VALUE']
-        property['buildingAssessment'] = json[0]['CURRENT_IMPROVEMENT_VALUE']
-        property['prevLandAssessment'] = json[0]['PREVIOUS_LAND_VALUE']
-        property['bigImprovYear'] = json[0]['BIG_IMPROVEMENT_YEAR']
-        property['zoneCategory'] = json[0]['ZONE_CATEGORY']
-        property['totalAssessment'] =
-          property.landAssessment + property.buildingAssessment
+      const zoneUrl = `http://bylaws.vancouver.ca/zoning/${zone}.pdf`
 
-        this.setState({ property })
-      }
+      this.setState(prevState => ({
+        property: {
+          ...prevState.property,
+          yearBuilt,
+          propertyTax,
+          assessmentYear,
+          landAssessment,
+          buildingAssessment,
+          prevLandAssessment,
+          bigImprovYear,
+          zone,
+          zoneUrl,
+          zoneCategory,
+          legalType,
+          totalAssessment
+        }
+      }))
     }
   }
   requestHouseholdIncome = async ctuid => {
-    const { json } = await apiFetch(
-      `${hostReda}/total-household-income/${ctuid}`
-    )
+    const url = `${hostReda}/total-household-income/${ctuid}`
+    const { json } = await apiFetch(url)
     if (json) {
-      console.log(json)
+      console.log(json);
+    }
+  }
+  requestRent = async ctuid => {
+    const url = `${hostReda}/rental-ct/${ctuid}`
+    const { json } = await apiFetch(url)
+    if (json) {
+      console.log(json);
     }
   }
   toggleZoning = (event, checked) => {
@@ -88,13 +105,135 @@ class App extends Component {
     filters['zoning'] = checked
     this.setState({ filters })
   }
+  toggleTransit = (event, checked) => {
+    const { map, popup, filters } = this.state
+    if (checked) {
+      map.addLayer({
+        id: 'transit-lines',
+        source: 'transit-lines',
+        'source-layer': 'rapid_transit_linegeojson',
+        minzoom: 11,
+        maxzoom: 22,
+        type: 'line',
+        paint: {
+          'line-color': '#128ef4',
+          'line-width': 2
+        }
+      })
+      map.addLayer({
+        id: 'transit-stations',
+        source: 'transit-stations',
+        'source-layer': 'rapid_transit_stationsgeojson',
+        minzoom: 11,
+        maxzoom: 22,
+        type: 'circle',
+        paint: {
+          'circle-radius': {
+            base: 1.4,
+            stops: [[12, 2], [22, 180]]
+          },
+          'circle-color': 'rgb(214, 21, 21)'
+        }
+      })
+      map.on('mousemove', 'transit-stations', e => {
+        map.getCanvas().style.cursor = 'pointer'
 
+        const feature = e.features[0]
+        const { Name } = feature.properties
+
+        popup
+          .setLngLat(feature.geometry.coordinates)
+          .setHTML(Name)
+          .addTo(map)
+      })
+      map.on('mouseleave', 'transit-stations', () => {
+        map.getCanvas().style.cursor = ''
+        popup.remove()
+      })
+    } else {
+      map.removeLayer('transit-lines')
+      map.removeLayer('transit-stations')
+    }
+    filters['transit'] = checked
+    this.setState({ filters })
+  }
+  toggleFire = (event, checked) => {
+    const { map, filters } = this.state
+    if (checked) {
+      map.addLayer({
+        id: 'fire-hydrants',
+        source: 'fire-hydrants',
+        'source-layer': 'water_hydrantsgeojson',
+        minzoom: 11,
+        maxzoom: 22,
+        type: 'circle',
+        paint: {
+          'circle-radius': {
+            base: 2,
+            stops: [[12, 2], [22, 180]]
+          },
+          'circle-color': 'rgb(214, 21, 21)'
+        }
+      })
+    } else {
+      map.removeLayer('fire-hydrants')
+    }
+    filters['fireHydrants'] = checked
+    this.setState({ filters })
+  }
+  toggleSchools = (event, checked) => {
+    const { map, popup, filters } = this.state
+    if (checked) {
+      map.addLayer({
+        id: 'school-points',
+        source: 'schools',
+        'source-layer': 'schoolsgeojson',
+        minzoom: 11,
+        maxzoom: 22,
+        type: 'circle',
+        paint: {
+          'circle-radius': {
+            base: 1.5,
+            stops: [[12, 2], [22, 180]]
+          },
+          'circle-color': '#f412da'
+        }
+      })
+
+      map.on('mousemove', 'school-points', e => {
+        map.getCanvas().style.cursor = 'pointer'
+
+        const feature = e.features[0]
+        const { Description } = feature.properties
+
+        const indexName = Description.indexOf('NAME:')
+        const indexAddress = Description.indexOf('ADDRESS:')
+        const indexCategory = Description.indexOf('SCHOOL_CATEGORY:')
+
+        const name = Description.substring(indexName + 5, indexAddress)
+        const category = Description.substring(indexCategory + 16)
+
+        popup
+          .setLngLat(feature.geometry.coordinates)
+          .setHTML(`<div>${name}<br/>${category}</div>`)
+          .addTo(map)
+      })
+      map.on('mouseleave', 'school-points', () => {
+        map.getCanvas().style.cursor = ''
+        popup.remove()
+      })
+    } else {
+      map.removeLayer('school-points')
+    }
+    filters['schools'] = checked
+    this.setState({ filters })
+  }
   toggleSatellite = (event, checked) => {
     const { map, filters } = this.state
 
     const layers = map.getStyle().layers
 
-    const sourceIds = ['census-tracts', 'properties', 'zoning']
+    const sourceIds = ['census-tracts', 'dissemination_area', 'schools', 'fire-hydrants', 'transit-lines', 'transit-stations', 'properties', 'zoning']
 
     const style = `mapbox://styles/mapbox/${checked ? 'satellite' : 'basic'}-v9`
     map.setStyle(style)
@@ -113,49 +252,54 @@ class App extends Component {
     filters['satellite'] = checked
     this.setState({ filters })
   }
-  removeSelection = () => {
-    const { selectedProperty, map } = this.state
-    const { layer, filter } = selectedProperty
-    map.setFilter(layer, ['==', filter, ''])
-    this.setState({ selectedProperty: null })
-  }
   renderLayers = map => {
     addSources(map)
+
+    const popup = new mapboxgl.Popup({
+      closeButton: false,
+      closeOnClick: false
+    })
 
     map.addLayer(zoneFill)
 
     sources.map(src => {
-      const { source, sourceLayer, maxzoom, minzoom, filter } = src
+      const { source, filter } = src
 
       addLayers(map, src)
 
-      map.on('click', `properties-fill`, e => {
-        console.log('Selected Property', e)
+      map.on('click', `${source}-fill`, e => {
         const feature = e.features[0]
 
+        const { Description } = feature.properties
         const filterName = feature.properties[filter]
         const layer = `${source}-fill-click`
+
+        const indexPcoord = Description.indexOf('PCOORD:')
+        const indexSiteId = Description.indexOf('SITE_ID:')
+        const pcoord = Description.substring(indexPcoord + 7, indexSiteId - 1)
+
+        const { selectedProperty } = this.state
+        if (selectedProperty) {
+          if (selectedProperty.pcoord === pcoord) {
+            map.setFilter(layer, ['==', filter, ''])
+            this.setState({ selectedProperty: null })
+            return false
+          }
+        }
+
         if (filterName) {
           map.setFilter(layer, ['==', filter, filterName])
-          const selectedProperty = {
-            filter,
-            layer
-          }
-          this.setState({ selectedProperty })
+          this.setState({ selectedProperty: this.state.property })
         }
       })
+
       map.on('mousemove', `${source}-fill`, e => {
-        const { property, selectedProperty } = this.state
-        if (selectedProperty) {
-          console.log('Property is already selected')
-          return false
-        }
+        const { property } = this.state
 
         const feature = e.features[0]
 
         const { source } = feature.layer
 
-        let zone
         if (source === 'properties') {
           const { Description } = feature.properties
           const indexCivicNum = Description.indexOf('CIVIC_NUMBER:')
@@ -164,60 +308,44 @@ class App extends Component {
           const indexSiteId = Description.indexOf('SITE_ID:')
           const pcoord = Description.substring(indexPcoord + 7, indexSiteId - 1)
 
-          const streetNumber = Description.substring(
+          const number = Description.substring(
             indexCivicNum + 13,
             indexStdStreet - 1
           )
-          const streetName = Description.substring(
+          const street = Description.substring(
             indexStdStreet + 11,
             indexPcoord - 1
           )
-
-          property['number'] = streetNumber
-          property['street'] = streetName
-          property['pcoord'] = pcoord
-
-          this.requestProperty(pcoord)
-
-          const zoneFeatures = map.queryRenderedFeatures(e.point, {
-            layers: ['zoning-fill']
-          })
-          if (zoneFeatures[0]) {
-            const { Name } = zoneFeatures[0].properties
-            const url = `http://bylaws.vancouver.ca/zoning/${Name}.pdf`
-            property['zoneUrl'] = url
-            property['zone'] = Name
+          if (this.state.property.pcoord !== pcoord) {
+            this.requestProperty(pcoord)
+            this.reverseGeocode()
+            this.setState(prevState => ({
+              property: { ...prevState.property, number, street, pcoord }
+            }))
           }
-          this.setState({ property })
         } else if (source === 'census-tracts') {
           console.log(feature)
           const ctuid = feature.properties['CTUID']
           this.requestHouseholdIncome(ctuid)
+          // this.requestRent(ctuid)
         }
 
         const filterName = feature.properties[filter]
         map.setFilter(`${source}-fill-hover`, ['==', filter, filterName])
         map.setFilter(`${source}-line-hover`, ['==', filter, filterName])
-
-        this.reverseGeocode(e.lngLat)
-
-        this.setState({
-          properties: feature.properties,
-          lngLat: e.lngLat,
-          zone
-        })
       })
       map.on('mouseleave', `${source}-fill`, () => {
         map.setFilter(`${source}-fill-hover`, ['==', filter, ''])
         map.setFilter(`${source}-line-hover`, ['==', filter, ''])
+        this.setState({ property: initialState.property })
       })
       return true
     })
 
-    this.setState({ map })
+    this.setState({ map, popup })
   }
   render() {
-    const { filters, location, property } = this.state
+    const { filters, location, property, selectedProperty } = this.state
 
     if (window.innerWidth <= 768) {
       return (
@@ -236,11 +364,15 @@ class App extends Component {
         <div className="row h-100">
           <Sidebar
             filters={filters}
-            property={property}
-            location={location}
+            property={selectedProperty ? selectedProperty : property}
+            selectedProperty={selectedProperty}
             toggleZoning={this.toggleZoning}
             toggleSatellite={this.toggleSatellite}
+            toggleSchools={this.toggleSchools}
+            toggleFire={this.toggleFire}
+            toggleTransit={this.toggleTransit}
           />
+          {selectedProperty && property.pcoord && <Sidebar filters={filters} property={property} selectedProperty={selectedProperty} />}
           <div className="col">
             <div
               ref={el => (this.mapContainer = el)}

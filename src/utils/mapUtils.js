@@ -62,6 +62,10 @@ export const addSources = map => {
       type: 'vector',
       url: 'mapbox://tmirmota.3u8wgv7d'
     })
+    .addSource('dissemination_area', {
+      type: 'vector',
+      url: 'mapbox://tmirmota.22vjwdw2'
+    })
     .addSource('properties', {
       type: 'vector',
       url: 'mapbox://tmirmota.69r2qz2u'
@@ -69,5 +73,21 @@ export const addSources = map => {
     .addSource('zoning', {
       type: 'vector',
       url: 'mapbox://tmirmota.5h7gkfwq'
+    })
+    .addSource('schools', {
+      type: 'vector',
+      url: 'mapbox://tmirmota.7qw6uywz'
+    })
+    .addSource('fire-hydrants', {
+      type: 'vector',
+      url: 'mapbox://tmirmota.1vk80tum'
+    })
+    .addSource('transit-lines', {
+      type: 'vector',
+      url: 'mapbox://tmirmota.26nf1ybn'
+    })
+    .addSource('transit-stations', {
+      type: 'vector',
+      url: 'mapbox://tmirmota.09jmh0eh'
     })
 }

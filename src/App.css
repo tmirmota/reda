@@ -15,3 +15,15 @@
 .mapboxgl-ctrl-geocoder {
   min-width: 300px !important;
 }
+
+.sidebar-filters {
+  bottom: 0;
+  position: absolute;
+  display: grid;
+}
+
+.sidebar-side {
+  margin-left: 240px;
+  position: absolute;
+  min-height: 100%;
+}

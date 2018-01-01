@@ -1,10 +1,13 @@
 const initialState = {
   lat: 49.2532,
   lng: -123.1113,
-  zoom: 17,
+  zoom: 12,
   filters: {
     zoning: false,
-    satellite: false
+    satellite: false,
+    transit: false,
+    schools: false,
+    fireHydrants: false
   },
   property: {
     number: null,
@@ -24,7 +27,8 @@ const initialState = {
     zoneCategory: null,
     legalType: null,
     pcoord: null
-  }
+  },
+  selectedProperty: null
 }
 
 export default initialState

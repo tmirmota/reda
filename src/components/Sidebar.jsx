@@ -4,10 +4,19 @@ import { FormControlLabel } from 'material-ui/Form'
 import Switch from 'material-ui/Switch'
 import Button from 'material-ui/Button'
 
-const Sidebar = ({ filters, property, location, selectedProperty = false }) => {
-  const { number, street, neighborhood, city } = location
+const Sidebar = ({
+  filters = null,
+  property,
+  selectedProperty = false,
+  toggleZoning = null,
+  toggleSatellite = null
+}) => {
   const { zoning, satellite } = filters
   const {
+    number,
+    street,
+    neighborhood,
+    city,
     yearBuilt,
     propertyTax,
     assessmentYear,
@@ -19,8 +28,7 @@ const Sidebar = ({ filters, property, location, selectedProperty = false }) => {
     zone,
     zoneUrl,
     zoneCategory,
-    legalType,
-    pcoord
+    legalType
   } = property
   const toCAD = number => {
     if (number) {
@@ -59,15 +67,17 @@ const Sidebar = ({ filters, property, location, selectedProperty = false }) => {
           <em>{assessmentYear}</em>
         </span>
       </div>
-      <strong>
-        <span>Total Value</span>
-        <span className="float-right">{toCAD(totalAssessment)}</span>
-      </strong>
+      <div className="mb-1">
+        <strong>
+          <span>Total Value</span>
+          <span className="float-right">{toCAD(totalAssessment)}</span>
+        </strong>
+      </div>
       <div>
         <span>Land</span>
         <span className="float-right">{toCAD(landAssessment)}</span>
       </div>
-      <div>
+      <div className="mb-1">
         <span>Building</span>
         <span className="float-right">{toCAD(buildingAssessment)}</span>
       </div>
@@ -97,11 +107,11 @@ const Sidebar = ({ filters, property, location, selectedProperty = false }) => {
       </div>
       <hr />
       <FormControlLabel
-        control={<Switch checked={zoning} onChange={this.toggleZoning} />}
+        control={<Switch checked={zoning} onChange={toggleZoning} />}
         label="Zoning"
       />
       <FormControlLabel
-        control={<Switch checked={satellite} onChange={this.toggleSatellite} />}
+        control={<Switch checked={satellite} onChange={toggleSatellite} />}
         label="Satellite"
       />
       {selectedProperty && (

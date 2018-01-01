@@ -5,31 +5,29 @@ import './App.css'
 import mapboxgl from 'mapbox-gl'
 import MapboxGeocoder from 'mapbox-gl-geocoder'
 
-// Material UI
-import Button from 'material-ui/Button'
-import Switch from 'material-ui/Switch'
-import { FormControlLabel } from 'material-ui/Form'
-
 // Components
 import Sidebar from './components/Sidebar'
 
 // Constants
-import { mapboxAccessToken, sources } from './constants/MapboxConstants'
+import {
+  mapboxAccessToken,
+  sources,
+  zoneFill,
+  zoneLine
+} from './constants/MapboxConstants'
 import initialState from './constants/InitialState'
 
 // Utilities
-import { apiFetch } from './utils/apiUtils'
+import { hostReda, hostMapbox, apiFetch } from './utils/apiUtils'
 import { addSources, addLayers } from './utils/mapUtils'
 
 mapboxgl.accessToken = mapboxAccessToken
 
-const host = 'https://reda-188106.appspot.com'
-
 class App extends Component {
   state = initialState
   reverseGeocode = async () => {
-    const { lng, lat, location } = this.state
-    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${mapboxgl.accessToken}`
+    const { lng, lat, property } = this.state
+    const url = `${hostMapbox}/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${mapboxgl.accessToken}`
     const { json } = await apiFetch(url)
     if (json) {
       let neighborhood
@@ -41,18 +39,19 @@ class App extends Component {
         if (type === 'place') return (place = feature.text)
       })
 
-      location['neighborhood'] = neighborhood
-      location['city'] = place
+      property['neighborhood'] = neighborhood
+      property['city'] = place
 
-      this.setState({ location })
+      this.setState({ property })
     }
   }
   requestProperty = async newPcoord => {
     const { property } = this.state
-    if (this.state.pcoord !== newPcoord) {
-      this.setState({ pcoord: newPcoord })
+    if (Number(property.pcoord) !== newPcoord) {
+      property['pcoord'] = newPcoord
+      this.setState({ property })
 
-      const url = `${host}/land-coordinate/${newPcoord}`
+      const url = `${hostReda}/land-coordinate/${newPcoord}`
       const { json } = await apiFetch(url)
 
       if (json) {
@@ -72,40 +71,26 @@ class App extends Component {
     }
   }
   requestHouseholdIncome = async ctuid => {
-    const { json } = await apiFetch(`${host}/total-household-income/${ctuid}`)
+    const { json } = await apiFetch(
+      `${hostReda}/total-household-income/${ctuid}`
+    )
     if (json) {
       console.log(json)
     }
   }
-  toggleZoning = name => (event, checked) => {
-    const { map } = this.state
-
+  toggleZoning = (event, checked) => {
+    const { map, filters } = this.state
     if (checked) {
-      map.addLayer({
-        id: 'zoning-line',
-        source: 'zoning',
-        'source-layer': 'zoning_districtsgeojson',
-        minzoom: 11,
-        maxzoom: 22,
-        type: 'line',
-        paint: {
-          'line-color': '#f412da'
-        }
-      })
+      map.addLayer(zoneLine)
     } else {
       map.removeLayer('zoning-line')
     }
+    filters['zoning'] = checked
+    this.setState({ filters })
+  }
 
-    this.setState({ [name]: checked })
-  }
-  removeSelection = () => {
-    const { selectedProperty, map } = this.state
-    const { layer, filter } = selectedProperty
-    map.setFilter(layer, ['==', filter, ''])
-    this.setState({ selectedProperty: null })
-  }
   toggleSatellite = (event, checked) => {
-    const { map } = this.state
+    const { map, filters } = this.state
 
     const layers = map.getStyle().layers
 
@@ -116,7 +101,7 @@ class App extends Component {
     map.on('style.load', () => {
       const noSources = !map.getSource('census-tracts')
       if (noSources) {
-        this.addSources(map)
+        addSources(map)
         layers.map(layer => {
           if (sourceIds.includes(layer.source)) {
             map.addLayer(layer)
@@ -125,23 +110,19 @@ class App extends Component {
         })
       }
     })
-    this.setState({ satellite: checked })
+    filters['satellite'] = checked
+    this.setState({ filters })
+  }
+  removeSelection = () => {
+    const { selectedProperty, map } = this.state
+    const { layer, filter } = selectedProperty
+    map.setFilter(layer, ['==', filter, ''])
+    this.setState({ selectedProperty: null })
   }
   renderLayers = map => {
     addSources(map)
 
-    map.addLayer({
-      id: 'zoning-fill2',
-      source: 'zoning',
-      'source-layer': 'zoning_districtsgeojson',
-      minzoom: 11,
-      maxzoom: 22,
-      type: 'fill',
-      paint: {
-        'fill-opacity': 0.0,
-        'fill-color': '#FFFFFF'
-      }
-    })
+    map.addLayer(zoneFill)
 
     sources.map(src => {
       const { source, sourceLayer, maxzoom, minzoom, filter } = src
@@ -164,7 +145,8 @@ class App extends Component {
         }
       })
       map.on('mousemove', `${source}-fill`, e => {
-        if (this.state.selectedProperty) {
+        const { property, selectedProperty } = this.state
+        if (selectedProperty) {
           console.log('Property is already selected')
           return false
         }
@@ -191,25 +173,22 @@ class App extends Component {
             indexPcoord - 1
           )
 
-          const propertyAddress = {
-            number: streetNumber,
-            street: streetName
-          }
+          property['number'] = streetNumber
+          property['street'] = streetName
+          property['pcoord'] = pcoord
 
           this.requestProperty(pcoord)
 
           const zoneFeatures = map.queryRenderedFeatures(e.point, {
-            layers: ['zoning-fill2']
+            layers: ['zoning-fill']
           })
           if (zoneFeatures[0]) {
-            const { Name, Description } = zoneFeatures[0].properties
-            const urlStart = Description.indexOf('zone_url') + 18
-            const urlEnd =
-              Description.substring(urlStart).indexOf('</td>') + urlStart
+            const { Name } = zoneFeatures[0].properties
             const url = `http://bylaws.vancouver.ca/zoning/${Name}.pdf`
-            zone = { name: Name, url }
+            property['zoneUrl'] = url
+            property['zone'] = Name
           }
-          this.setState({ propertyAddress })
+          this.setState({ property })
         } else if (source === 'census-tracts') {
           console.log(feature)
           const ctuid = feature.properties['CTUID']
@@ -255,7 +234,13 @@ class App extends Component {
     return (
       <div className="container-fluid h-100 no-bleed">
         <div className="row h-100">
-          <Sidebar filters={filters} property={property} location={location} />
+          <Sidebar
+            filters={filters}
+            property={property}
+            location={location}
+            toggleZoning={this.toggleZoning}
+            toggleSatellite={this.toggleSatellite}
+          />
           <div className="col">
             <div
               ref={el => (this.mapContainer = el)}

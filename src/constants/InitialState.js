@@ -1,19 +1,16 @@
 const initialState = {
   lat: 49.2532,
   lng: -123.1113,
-  lngLat: null,
   zoom: 17,
   filters: {
     zoning: false,
     satellite: false
   },
-  location: {
+  property: {
     number: null,
     street: null,
     neighborhood: null,
-    city: null
-  },
-  property: {
+    city: null,
     yearBuilt: null,
     propertyTax: null,
     assessmentYear: null,

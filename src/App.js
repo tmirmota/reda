@@ -1,95 +1,80 @@
 import React, { Component } from 'react'
-import mapboxgl from 'mapbox-gl'
-import MapboxGeocoder from 'mapbox-gl-geocoder'
 import './App.css'
 
-import { withStyles } from 'material-ui/styles'
-import Switch from 'material-ui/Switch'
+// Mapbox
+import mapboxgl from 'mapbox-gl'
+import MapboxGeocoder from 'mapbox-gl-geocoder'
+
+// Material UI
 import Button from 'material-ui/Button'
+import Switch from 'material-ui/Switch'
 import { FormControlLabel } from 'material-ui/Form'
 
+// Components
+import Sidebar from './components/Sidebar'
+
+// Constants
+import { mapboxAccessToken, sources } from './constants/MapboxConstants'
+import initialState from './constants/InitialState'
+
+// Utilities
 import { apiFetch } from './utils/apiUtils'
+import { addSources, addLayers } from './utils/mapUtils'
 
-mapboxgl.accessToken =
-  'pk.eyJ1IjoidG1pcm1vdGEiLCJhIjoiY2phenpkeHl1MW5xcTJ2bWsxa2J2c3B1NCJ9.VzfA7MRGj7E8mdTSBdA4Rw'
+mapboxgl.accessToken = mapboxAccessToken
 
-const sources = [
-  {
-    source: 'properties',
-    sourceLayer: 'property_parcel_polygonsgeojson',
-    minzoom: 14,
-    maxzoom: 19,
-    type: 'vector',
-    url: 'tmirmota.69r2qz2u',
-    filter: 'Name'
-  },
-  {
-    source: 'census-tracts',
-    sourceLayer: 'census_tracts_2016geojson',
-    minzoom: 9,
-    maxzoom: 14,
-    type: 'vector',
-    url: 'tmirmota.3u8wgv7d',
-    filter: 'CTUID'
-  }
-]
-
-const initialState = {
-  lat: 49.2532,
-  lng: -123.1113,
-  zoom: 17,
-  properties: null,
-  lngLat: null,
-  showZoning: false,
-  folio: null,
-  propertyDetails: null,
-  propertyAddress: null,
-  selectedProperty: null,
-  satellite: false,
-  neighborhood: null,
-  place: null
-}
-
-const styles = {
-  switch: { height: '75%' }
-}
+const host = 'https://reda-188106.appspot.com'
 
 class App extends Component {
   state = initialState
-  componentWillMount() {
-    this.requestProperty(739184050000)
-  }
-  reverseGeocode = async lngLat => {
-    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${lngLat.lng},${lngLat.lat}.json?access_token=${mapboxgl.accessToken}`
+  reverseGeocode = async () => {
+    const { lng, lat, location } = this.state
+    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${mapboxgl.accessToken}`
     const { json } = await apiFetch(url)
     if (json) {
       let neighborhood
       let place
+
       json.features.map(feature => {
         const type = feature.place_type[0]
-        if (type === 'neighborhood') {
-          neighborhood = feature.text
-        } else if (type === 'place') {
-          place = feature.text
-        }
+        if (type === 'neighborhood') return (neighborhood = feature.text)
+        if (type === 'place') return (place = feature.text)
       })
-      this.setState({ neighborhood, place })
+
+      location['neighborhood'] = neighborhood
+      location['city'] = place
+
+      this.setState({ location })
     }
   }
   requestProperty = async newPcoord => {
-    const { pcoord } = this.state
-
-    if (pcoord !== newPcoord) {
+    const { property } = this.state
+    if (this.state.pcoord !== newPcoord) {
       this.setState({ pcoord: newPcoord })
-      const { json } = await apiFetch(
-        `https://reda-188106.appspot.com/land-coordinate/${newPcoord}`
-      )
+
+      const url = `${host}/land-coordinate/${newPcoord}`
+      const { json } = await apiFetch(url)
 
       if (json) {
-        this.setState({ propertyDetails: json[0] })
-      } else {
-        return false
+        property['yearBuilt'] = json[0]['YEAR_BUILT']
+        property['propertyTax'] = json[0]['TAX_LEVY']
+        property['assessmentYear'] = json[0]['TAX_ASSESSMENT_YEAR']
+        property['landAssessment'] = json[0]['CURRENT_LAND_VALUE']
+        property['buildingAssessment'] = json[0]['CURRENT_IMPROVEMENT_VALUE']
+        property['prevLandAssessment'] = json[0]['PREVIOUS_LAND_VALUE']
+        property['bigImprovYear'] = json[0]['BIG_IMPROVEMENT_YEAR']
+        property['zoneCategory'] = json[0]['ZONE_CATEGORY']
+        property['totalAssessment'] =
+          property.landAssessment + property.buildingAssessment
+
+        this.setState({ property })
       }
+    }
+  }
+  requestHouseholdIncome = async ctuid => {
+    const { json } = await apiFetch(`${host}/total-household-income/${ctuid}`)
+    if (json) {
+      console.log(json)
     }
   }
   toggleZoning = name => (event, checked) => {
@@ -142,25 +127,8 @@ class App extends Component {
     })
     this.setState({ satellite: checked })
   }
-  addSources = map => {
-    map
-      .addSource('census-tracts', {
-        type: 'vector',
-        url: 'mapbox://tmirmota.3u8wgv7d'
-      })
-      .addSource('properties', {
-        type: 'vector',
-        url: 'mapbox://tmirmota.69r2qz2u'
-      })
-      .addSource('zoning', {
-        type: 'vector',
-        url: 'mapbox://tmirmota.5h7gkfwq'
-      })
-  }
   renderLayers = map => {
-    const fillColor = '#3f51b5'
-
-    this.addSources(map)
+    addSources(map)
 
     map.addLayer({
       id: 'zoning-fill2',
@@ -175,61 +143,10 @@ class App extends Component {
       }
     })
 
-    sources.map(({ source, sourceLayer, maxzoom, minzoom, filter }) => {
-      map.addLayer({
-        id: `${source}-fill`,
-        source,
-        'source-layer': sourceLayer,
-        minzoom,
-        maxzoom,
-        type: 'fill',
-        paint: {
-          'fill-opacity': 0.2,
-          'fill-color': fillColor
-        }
-      })
-      map.addLayer({
-        id: `${source}-line`,
-        source,
-        'source-layer': sourceLayer,
-        minzoom,
-        maxzoom,
-        type: 'line',
-        paint: {
-          'line-color': '#7986cb'
-        }
-      })
-      map.addLayer({
-        id: `${source}-fill-hover`,
-        source,
-        'source-layer': sourceLayer,
-        type: 'fill',
-        paint: {
-          'fill-opacity': 0.5,
-          'fill-color': '#1de9b6'
-        },
-        filter: ['==', filter, '']
-      })
-      map.addLayer({
-        id: `${source}-line-hover`,
-        source,
-        'source-layer': sourceLayer,
-        type: 'line',
-        paint: {
-          'line-color': '#1de9b6'
-        },
-        filter: ['==', filter, '']
-      })
-      map.addLayer({
-        id: `${source}-fill-click`,
-        source,
-        'source-layer': sourceLayer,
-        type: 'fill',
-        paint: {
-          'fill-color': '#e9291d'
-        },
-        filter: ['==', filter, '']
-      })
+    sources.map(src => {
+      const { source, sourceLayer, maxzoom, minzoom, filter } = src
+
+      addLayers(map, src)
 
       map.on('click', `properties-fill`, e => {
         console.log('Selected Property', e)
@@ -294,6 +211,9 @@ class App extends Component {
           }
           this.setState({ propertyAddress })
         } else if (source === 'census-tracts') {
+          console.log(feature)
+          const ctuid = feature.properties['CTUID']
+          this.requestHouseholdIncome(ctuid)
         }
 
         const filterName = feature.properties[filter]
@@ -318,19 +238,7 @@ class App extends Component {
     this.setState({ map })
   }
   render() {
-    const {
-      lngLat,
-      showZoning,
-      zone,
-      propertyDetails,
-      propertyAddress,
-      selectedProperty,
-      satellite,
-      neighborhood,
-      place
-    } = this.state
-
-    const { classes } = this.props
+    const { filters, location, property } = this.state
 
     if (window.innerWidth <= 768) {
       return (
@@ -347,151 +255,7 @@ class App extends Component {
     return (
       <div className="container-fluid h-100 no-bleed">
         <div className="row h-100">
-          <div className="col pt-4 sidebar">
-            {lngLat && (
-              <div>
-                <div>
-                  <div>
-                    {propertyAddress ? (
-                      <div className="lead">
-                        {propertyAddress.number} {propertyAddress.street}
-                      </div>
-                    ) : (
-                      ''
-                    )}
-                    <div className="text-muted">
-                      {neighborhood}
-                      {neighborhood && place && ', '}
-                      {place}
-                    </div>
-                  </div>
-                  <hr />
-                  {propertyDetails && (
-                    <div>
-                      <div>
-                        <div className="sidebar-heading">
-                          <strong className="text-uppercase">
-                            Property Details
-                          </strong>
-                        </div>
-                        <div>
-                          <span>Year Built </span>
-                          <span className="float-right">
-                            {propertyDetails['YEAR_BUILT']}
-                          </span>
-                        </div>
-                        <div>
-                          <span>Property Taxes </span>
-                          <span className="float-right">
-                            ${propertyDetails['TAX_LEVY']
-                              .toString()
-                              .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                          </span>
-                        </div>
-                      </div>
-                      <hr />
-                      <div>
-                        <div className="sidebar-heading">
-                          <strong className="text-uppercase">Assessment</strong>
-                          <span className="float-right text-muted">
-                            <em>{propertyDetails['TAX_ASSESSMENT_YEAR']}</em>
-                          </span>
-                        </div>
-                        <strong>
-                          <span>Total Value</span>
-                          <span className="float-right">
-                            ${(propertyDetails['CURRENT_LAND_VALUE'] + propertyDetails['CURRENT_IMPROVEMENT_VALUE'])
-                              .toString()
-                              .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                          </span>
-                        </strong>
-                        <div>
-                          <span>Land</span>
-                          <span className="float-right">
-                            ${propertyDetails['CURRENT_LAND_VALUE']
-                              .toString()
-                              .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                          </span>
-                        </div>
-                        <div>
-                          <span>Building</span>
-                          <span className="float-right">
-                            ${propertyDetails['CURRENT_IMPROVEMENT_VALUE']
-                              .toString()
-                              .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="text-muted">Prev. Land Value </span>
-                          <span className="float-right text-muted">
-                            ${propertyDetails['PREVIOUS_LAND_VALUE']
-                              .toString()
-                              .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="text-muted">
-                            Big Improvement Year
-                          </span>
-                          <span className="float-right text-muted">
-                            {propertyDetails['BIG_IMPROVEMENT_YEAR']}
-                          </span>
-                        </div>
-                      </div>
-                      <hr />
-                      <div>
-                        <div>
-                          <div className="sidebar-heading">
-                            <strong className="text-uppercase">Zoning</strong>
-                            <span className="float-right">
-                              <Switch
-                                checked={showZoning}
-                                onChange={this.toggleZoning('showZoning')}
-                                classes={{ default: classes.switch }}
-                              />
-                            </span>
-                          </div>
-                        </div>
-                        <div>
-                          {zone ? (
-                            <a href={zone.url} target="_blank">
-                              {zone.name}
-                            </a>
-                          ) : (
-                            ''
-                          )}
-                        </div>
-                        <div>{propertyDetails['ZONE_CATEGORY']}</div>
-                        <div>
-                          <span>Legal Type: </span>
-                          <span className="text-capitalize">
-                            {propertyDetails['LEGAL_TYPE']}
-                          </span>
-                        </div>
-                      </div>
-                      <hr />
-                    </div>
-                  )}
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={satellite}
-                        onChange={this.toggleSatellite}
-                      />
-                    }
-                    label="Satellite"
-                  />
-                  {selectedProperty && (
-                    <div className="text-center">
-                      <Button color="accent" onClick={this.removeSelection}>
-                        Remove Selection
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
+          <Sidebar filters={filters} property={property} location={location} />
           <div className="col">
             <div
               ref={el => (this.mapContainer = el)}
@@ -538,4 +302,4 @@ class App extends Component {
   }
 }
 
-export default withStyles(styles)(App)
+export default App

@@ -25,9 +25,10 @@ mapboxgl.accessToken = mapboxAccessToken
 
 class App extends Component {
   state = initialState
-  reverseGeocode = async () => {
+  reverseGeocode = async lngLat => {
+    console.log('property request')
     const { lng, lat } = this.state
-    const url = `${hostMapbox}/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${mapboxgl.accessToken}`
+    const url = `${hostMapbox}/geocoding/v5/mapbox.places/${lngLat.lng},${lngLat.lat}.json?access_token=${mapboxgl.accessToken}`
     const { json } = await apiFetch(url)
     if (json) {
       let neighborhood
@@ -40,7 +41,9 @@ class App extends Component {
         return true
       })
 
-      this.setState(prevState => ({ property: { ...prevState.property, neighborhood, city } }))
+      this.setState(prevState => ({
+        property: { ...prevState.property, neighborhood, city }
+      }))
     }
   }
   requestProperty = async pcoord => {
@@ -48,51 +51,112 @@ class App extends Component {
     const { json } = await apiFetch(url)
 
     if (json) {
-      const yearBuilt = json[0]['YEAR_BUILT']
-      const propertyTax = json[0]['TAX_LEVY']
-      const assessmentYear = json[0]['TAX_ASSESSMENT_YEAR']
-      const landAssessment = json[0]['CURRENT_LAND_VALUE']
-      const buildingAssessment = json[0]['CURRENT_IMPROVEMENT_VALUE']
-      const prevLandAssessment = json[0]['PREVIOUS_LAND_VALUE']
-      const bigImprovYear = json[0]['BIG_IMPROVEMENT_YEAR']
-      const zone = json[0]['ZONE_NAME']
-      const zoneCategory = json[0]['ZONE_CATEGORY']
-      const legalType = json[0]['LEGAL_TYPE']
-      const totalAssessment = landAssessment + buildingAssessment
+      if (json.length > 0) {
+        const yearBuilt = json[0]['YEAR_BUILT']
+        const propertyTax = json[0]['TAX_LEVY']
+        const assessmentYear = json[0]['TAX_ASSESSMENT_YEAR']
+        const landAssessment = json[0]['CURRENT_LAND_VALUE']
+        const buildingAssessment = json[0]['CURRENT_IMPROVEMENT_VALUE']
+        const prevLandAssessment = json[0]['PREVIOUS_LAND_VALUE']
+        const bigImprovYear = json[0]['BIG_IMPROVEMENT_YEAR']
+        const zone = json[0]['ZONE_NAME']
+        const zoneCategory = json[0]['ZONE_CATEGORY']
+        const legalType = json[0]['LEGAL_TYPE']
+        const totalAssessment = landAssessment + buildingAssessment
 
-      const zoneUrl = `http://bylaws.vancouver.ca/zoning/${zone}.pdf`
+        const zoneUrl = `http://bylaws.vancouver.ca/zoning/${zone}.pdf`
 
-      this.setState(prevState => ({
-        property: {
-          ...prevState.property,
-          yearBuilt,
-          propertyTax,
-          assessmentYear,
-          landAssessment,
-          buildingAssessment,
-          prevLandAssessment,
-          bigImprovYear,
-          zone,
-          zoneUrl,
-          zoneCategory,
-          legalType,
-          totalAssessment
-        }
-      }))
+        this.setState(prevState => ({
+          property: {
+            ...prevState.property,
+            yearBuilt,
+            propertyTax,
+            assessmentYear,
+            landAssessment,
+            buildingAssessment,
+            prevLandAssessment,
+            bigImprovYear,
+            zone,
+            zoneUrl,
+            zoneCategory,
+            legalType,
+            totalAssessment
+          }
+        }))
+      }
     }
   }
   requestHouseholdIncome = async ctuid => {
     const url = `${hostReda}/total-household-income/${ctuid}`
     const { json } = await apiFetch(url)
     if (json) {
-      console.log(json);
+      if (json.length > 0) {
+        const res = json[0]
+        const altGeoCode = res['ALT_GEO_CODE']
+        const medianTotalHouseholdIncome = res['MEDIAN_TOTAL_HOUSEHOLD_INCOME']
+        this.setState(prevState => ({
+          ct: {
+            ...prevState.ct,
+            altGeoCode,
+            medianTotalHouseholdIncome
+          }
+        }))
+      } else {
+        this.setState(prevState => ({
+          ct: {
+            ...prevState.ct,
+            medianTotalHouseholdIncome:
+              initialState.ct.medianTotalHouseholdIncome
+          }
+        }))
+      }
     }
   }
   requestRent = async ctuid => {
     const url = `${hostReda}/rental-ct/${ctuid}`
     const { json } = await apiFetch(url)
     if (json) {
-      console.log(json);
+      if (json.length > 0) {
+        const res = json[0]
+        const averageRent = {
+          bachelor: res['AVERAGE_RENT_BACHELOR'],
+          bedroom1: res['AVERAGE_RENT_BEDROOM_1'],
+          bedroom2: res['AVERAGE_RENT_BEDROOM_2'],
+          bedroom3: res['AVERAGE_RENT_BEDROOM_3_PLUS'],
+          total: res['AVERAGE_RENT_TOTAL']
+        }
+        const medianRent = {
+          bachelor: res['MEDIAN_RENT_BACHELOR'],
+          bedroom1: res['MEDIAN_RENT_BEDROOM_1'],
+          bedroom2: res['MEDIAN_RENT_BEDROOM_2'],
+          bedroom3: res['MEDIAN_RENT_BEDROOM_3_PLUS'],
+          total: res['MEDIAN_RENT_TOTAL']
+        }
+        const vacancyRate = {
+          bachelor: res['VACANCY_RATE_BACHELOR'],
+          bedroom1: res['VACANCY_RATE_BEDROOM_1'],
+          bedroom2: res['VACANCY_RATE_BEDROOM_2'],
+          bedroom3: res['VACANCY_RATE_BEDROOM_3_PLUS'],
+          total: res['VACANCY_RATE_TOTAL']
+        }
+        this.setState(prevState => ({
+          ct: {
+            ...prevState.ct,
+            averageRent,
+            medianRent,
+            vacancyRate
+          }
+        }))
+      } else {
+        this.setState(prevState => ({
+          ct: {
+            ...prevState.ct,
+            averageRent: initialState.ct.averageRent,
+            medianRent: initialState.ct.medianRent,
+            vacancyRate: initialState.ct.vacancyRate
+          }
+        }))
+      }
     }
   }
   toggleZoning = (event, checked) => {
@@ -233,7 +297,16 @@ class App extends Component {
 
     const layers = map.getStyle().layers
 
-    const sourceIds = ['census-tracts', 'dissemination_area', 'schools', 'fire-hydrants', 'transit-lines', 'transit-stations', 'properties', 'zoning']
+    const sourceIds = [
+      'census-tracts',
+      'dissemination_area',
+      'schools',
+      'fire-hydrants',
+      'transit-lines',
+      'transit-stations',
+      'properties',
+      'zoning'
+    ]
 
     const style = `mapbox://styles/mapbox/${checked ? 'satellite' : 'basic'}-v9`
     map.setStyle(style)
@@ -262,40 +335,33 @@ class App extends Component {
 
     map.addLayer(zoneFill)
 
+    map.on('click', `properties-fill`, e => {
+      const feature = e.features[0]
+
+      const { Name, Description } = feature.properties
+      const layer = `properties-fill-click`
+
+      const indexPcoord = Description.indexOf('PCOORD:')
+      const indexSiteId = Description.indexOf('SITE_ID:')
+      const newPcoord = Description.substring(indexPcoord + 7, indexSiteId - 1)
+
+      const { selectedProperty } = this.state
+      const pcoord = selectedProperty ? selectedProperty.pcoord : null
+      if (pcoord === newPcoord) {
+        map.setFilter(layer, ['==', 'Name', ''])
+        this.setState({ selectedProperty: null })
+      } else if (Name) {
+        map.setFilter(layer, ['==', 'Name', Name])
+        this.setState({ selectedProperty: this.state.property })
+      }
+    })
+
     sources.map(src => {
       const { source, filter } = src
 
       addLayers(map, src)
 
-      map.on('click', `${source}-fill`, e => {
-        const feature = e.features[0]
-
-        const { Description } = feature.properties
-        const filterName = feature.properties[filter]
-        const layer = `${source}-fill-click`
-
-        const indexPcoord = Description.indexOf('PCOORD:')
-        const indexSiteId = Description.indexOf('SITE_ID:')
-        const pcoord = Description.substring(indexPcoord + 7, indexSiteId - 1)
-
-        const { selectedProperty } = this.state
-        if (selectedProperty) {
-          if (selectedProperty.pcoord === pcoord) {
-            map.setFilter(layer, ['==', filter, ''])
-            this.setState({ selectedProperty: null })
-            return false
-          }
-        }
-
-        if (filterName) {
-          map.setFilter(layer, ['==', filter, filterName])
-          this.setState({ selectedProperty: this.state.property })
-        }
-      })
-
       map.on('mousemove', `${source}-fill`, e => {
-        const { property } = this.state
-
         const feature = e.features[0]
 
         const { source } = feature.layer
@@ -318,16 +384,34 @@ class App extends Component {
           )
           if (this.state.property.pcoord !== pcoord) {
             this.requestProperty(pcoord)
-            this.reverseGeocode()
+            this.reverseGeocode(e.lngLat)
             this.setState(prevState => ({
               property: { ...prevState.property, number, street, pcoord }
             }))
           }
-        } else if (source === 'census-tracts') {
-          console.log(feature)
+        } else if (
+          source === 'census-tracts' ||
+          source === 'dissemination_area'
+        ) {
           const ctuid = feature.properties['CTUID']
-          this.requestHouseholdIncome(ctuid)
-          // this.requestRent(ctuid)
+          const ctname = feature.properties['CTNAME']
+
+          if (this.state.ct.ctuid !== ctuid) {
+            this.requestHouseholdIncome(ctuid)
+            this.reverseGeocode(e.lngLat)
+          }
+
+          if (this.state.ct.ctname !== ctname) {
+            this.requestRent(ctname)
+          }
+
+          this.setState(prevState => ({
+            ct: {
+              ...prevState.ct,
+              ctuid,
+              ctname
+            }
+          }))
         }
 
         const filterName = feature.properties[filter]
@@ -345,7 +429,7 @@ class App extends Component {
     this.setState({ map, popup })
   }
   render() {
-    const { filters, location, property, selectedProperty } = this.state
+    const { filters, property, selectedProperty, ct, zoom } = this.state
 
     if (window.innerWidth <= 768) {
       return (
@@ -363,16 +447,25 @@ class App extends Component {
       <div className="container-fluid h-100 no-bleed">
         <div className="row h-100">
           <Sidebar
+            zoom={zoom}
             filters={filters}
             property={selectedProperty ? selectedProperty : property}
-            selectedProperty={selectedProperty}
+            region={ct}
             toggleZoning={this.toggleZoning}
             toggleSatellite={this.toggleSatellite}
             toggleSchools={this.toggleSchools}
             toggleFire={this.toggleFire}
             toggleTransit={this.toggleTransit}
           />
-          {selectedProperty && property.pcoord && <Sidebar filters={filters} property={property} selectedProperty={selectedProperty} />}
+          {selectedProperty &&
+            property.pcoord && (
+              <Sidebar
+                zoom={zoom}
+                filters={filters}
+                property={property}
+                region={ct}
+              />
+            )}
           <div className="col">
             <div
               ref={el => (this.mapContainer = el)}

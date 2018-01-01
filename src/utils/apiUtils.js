@@ -3,6 +3,6 @@ export const hostMapbox = 'https://api.mapbox.com'
 
 export const apiFetch = (url, method = 'GET', body) =>
   fetch(url, { method, body })
-    .then(res => res.json())
+    .then(res => res.status === 200 ? res.json() : console.log(res))
     .then(json => ({ json }))
     .catch(error => ({ error }))

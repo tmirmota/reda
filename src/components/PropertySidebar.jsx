@@ -4,6 +4,7 @@ import { toCAD } from '../utils/formatUtils'
 
 const PropertySidebar = ({ property }) => {
   const {
+    pid,
     number,
     street,
     neighborhood,
@@ -30,6 +31,10 @@ const PropertySidebar = ({ property }) => {
         {neighborhood}
         {neighborhood && city && ', '}
         {city}
+      </div>
+      <div className="text-muted">
+        {pid && 'PID: '}
+        {pid}
       </div>
       <hr />
       <div className="sidebar-heading text-uppercase">

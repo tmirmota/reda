@@ -52,6 +52,7 @@ class App extends Component {
 
     if (json) {
       if (json.length > 0) {
+        const pid = json[0]['PID']
         const yearBuilt = json[0]['YEAR_BUILT']
         const propertyTax = json[0]['TAX_LEVY']
         const assessmentYear = json[0]['TAX_ASSESSMENT_YEAR']
@@ -69,6 +70,7 @@ class App extends Component {
         this.setState(prevState => ({
           property: {
             ...prevState.property,
+            pid,
             yearBuilt,
             propertyTax,
             assessmentYear,

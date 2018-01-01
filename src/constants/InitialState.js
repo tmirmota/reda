@@ -10,6 +10,7 @@ const initialState = {
     fireHydrants: false
   },
   property: {
+    pid: null,
     number: null,
     street: null,
     neighborhood: null,

@@ -26,8 +26,6 @@ mapboxgl.accessToken = mapboxAccessToken
 class App extends Component {
   state = initialState
   reverseGeocode = async lngLat => {
-    console.log('property request')
-    const { lng, lat } = this.state
     const url = `${hostMapbox}/geocoding/v5/mapbox.places/${lngLat.lng},${lngLat.lat}.json?access_token=${mapboxgl.accessToken}`
     const { json } = await apiFetch(url)
     if (json) {

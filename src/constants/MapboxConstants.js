@@ -6,24 +6,24 @@ export const sources = [
     source: 'census-tracts',
     sourceLayer: 'census_tracts_2016geojson',
     minzoom: 9,
-    maxzoom: 13,
+    maxzoom: 14,
     type: 'vector',
     url: 'tmirmota.3u8wgv7d',
     filter: 'CTUID'
   },
-  {
-    source: 'dissemination_area',
-    sourceLayer: 'dissemination_areageojson',
-    minzoom: 13,
-    maxzoom: 15,
-    type: 'vector',
-    url: 'tmirmota.22vjwdw2',
-    filter: 'DAUID'
-  },
+  // {
+  //   source: 'dissemination_area',
+  //   sourceLayer: 'dissemination_areageojson',
+  //   minzoom: 13,
+  //   maxzoom: 15,
+  //   type: 'vector',
+  //   url: 'tmirmota.22vjwdw2',
+  //   filter: 'DAUID'
+  // },
   {
     source: 'properties',
     sourceLayer: 'property_parcel_polygonsgeojson',
-    minzoom: 15,
+    minzoom: 14,
     maxzoom: 22,
     type: 'vector',
     url: 'tmirmota.69r2qz2u',

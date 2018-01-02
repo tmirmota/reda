@@ -45,6 +45,13 @@ const polygon = (state = initialState, action) => {
         vacancyRate: action.vacancyRate,
       }
 
+    case types.UPDATE_POLYGON_IDS:
+      return {
+        ...state,
+        ctuid: action.ctuid,
+        ctname: action.ctname,
+      }
+
     default:
       return state
   }

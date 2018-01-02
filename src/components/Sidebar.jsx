@@ -10,7 +10,7 @@ import Switch from 'material-ui/Switch'
 
 const Sidebar = props => {
   const {
-    zoom,
+    mapFeatures,
     filters,
     toggleZoning = null,
     toggleSatellite = null,
@@ -20,8 +20,8 @@ const Sidebar = props => {
   } = props
   const { zoning, satellite, schools, fireHydrants, transit } = filters
   return (
-    <div className={`col pt-4 sidebar ${!toggleZoning && 'sidebar-side'}`}>
-      {zoom > 15 ? (
+    <div className="col pt-4 sidebar">
+      {mapFeatures.zoom > 15 ? (
         <PropertySidebar {...props} />
       ) : (
         <RegionSidebar {...props} />

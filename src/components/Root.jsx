@@ -5,19 +5,12 @@ import '../App.css'
 import SidebarContainer from '../containers/SidebarContainer'
 import MapContainer from '../containers/MapContainer'
 
+// Components
+import ErrorMessage from '../components/ErrorMessage'
+
 class Root extends Component {
   render() {
-    if (window.innerWidth <= 768) {
-      return (
-        <div className="container text-center mt-2">
-          <h2>Head to your nearest desktop computer!</h2>
-          <p>
-            Sorry, Reda's interface isn't quite ready for mobile devices like
-            yours.
-          </p>
-        </div>
-      )
-    }
+    if (window.innerWidth <= 768) return <ErrorMessage />
     return (
       <section className="container-fluid h-100 no-bleed">
         <div className="row h-100">

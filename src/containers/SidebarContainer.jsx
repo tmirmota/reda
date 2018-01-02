@@ -4,11 +4,18 @@ import Sidebar from '../components/Sidebar'
 
 const SidebarComponent = props => <Sidebar {...props} />
 
-const mapStateToProps = ({ property, selectedProperty, polygon, filters }) => ({
+const mapStateToProps = ({
   property,
   selectedProperty,
   polygon,
   filters,
+  mapFeatures,
+}) => ({
+  property,
+  selectedProperty,
+  polygon,
+  filters,
+  mapFeatures,
 })
 
 export default connect(mapStateToProps)(SidebarComponent)

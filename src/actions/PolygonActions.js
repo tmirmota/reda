@@ -49,3 +49,9 @@ export const fetchRent = ctuid => async dispatch => {
     }
   }
 }
+
+export const updatePolgyonIds = (ctuid, ctname) => ({
+  type: types.UPDATE_POLYGON_IDS,
+  ctuid,
+  ctname,
+})

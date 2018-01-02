@@ -2,14 +2,14 @@ import React from 'react'
 
 import { toCAD } from '../utils/formatUtils'
 
-const RegionSidebar = ({ property, region }) => {
+const RegionSidebar = ({ property, polygon }) => {
   const { neighborhood, city, zone, zoneUrl, zoneCategory } = property
   const {
     averageRent,
     medianRent,
     vacancyRate,
-    medianTotalHouseholdIncome
-  } = region
+    medianTotalHouseholdIncome,
+  } = polygon
   const vacancyStr = vacancyRate.total ? vacancyRate.total / 100 + '%' : ''
   return (
     <div>

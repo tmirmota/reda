@@ -16,7 +16,7 @@ const Sidebar = props => {
     toggleSatellite = null,
     toggleSchools = null,
     toggleFire = null,
-    toggleTransit = null
+    toggleTransit = null,
   } = props
   const { zoning, satellite, schools, fireHydrants, transit } = filters
   return (

@@ -1,0 +1,7 @@
+export const SET_MAP = 'SET_MAP'
+export const UPDATE_COORDINATES = 'UPDATE_COORDINATES'
+export const UPDATE_ADDRESS = 'UPDATE_ADDRESS'
+export const FETCH_PLACE = 'FETCH_PLACE'
+export const FETCH_PROPERTY = 'FETCH_PROPERTY'
+export const FETCH_INCOME = 'FETCH_INCOME'
+export const FETCH_RENT = 'FETCH_RENT'

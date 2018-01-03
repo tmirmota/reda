@@ -1,11 +1,15 @@
 import * as types from '../constants/ActionTypes'
-import { getNeighborhood, getCity } from '../utils/propertyUtils'
-import {
-  REVERSE_GEOCODE_URL,
-  LAND_COORD_URL,
-  HOUSEHOLD_INCOME_URL,
-} from '../constants/ApiConstants'
+import { REVERSE_GEOCODE_URL, LAND_COORD_URL } from '../constants/ApiConstants'
 import { apiFetch } from '../utils/apiUtils'
+import {
+  getPropertyDescription,
+  getNeighborhood,
+  getCity,
+} from '../utils/propertyUtils'
+import {
+  setSelectedProperty,
+  removeSelectedProperty,
+} from '../actions/SelectedProperty'
 
 export const fetchPlace = lngLat => async dispatch => {
   const query = `${lngLat.lng},${lngLat.lat}`
@@ -19,7 +23,7 @@ export const fetchPlace = lngLat => async dispatch => {
   }
 }
 
-export const fetchProperty = pcoord => async dispatch => {
+const fetchProperty = pcoord => async dispatch => {
   const url = `${LAND_COORD_URL.replace(':id', pcoord)}`
   const { json } = await apiFetch(url)
   if (json) {
@@ -58,9 +62,37 @@ export const fetchProperty = pcoord => async dispatch => {
   }
 }
 
-export const updateAddress = (number, street, pcoord) => ({
+const updateAddress = (number, street, pcoord) => ({
   type: types.UPDATE_ADDRESS,
   number,
   street,
   pcoord,
 })
+
+export const selectProperty = e => (dispatch, getState) => {
+  const { map, property, selectedProperty } = getState()
+  map.on('click', `properties-fill`, e => {
+    const { Name, Description } = e.features[0].properties
+    const layer = `properties-fill-click`
+    const propDetails = getPropertyDescription(Description)
+    const pcoord = selectedProperty ? selectedProperty.pcoord : null
+    if (pcoord === propDetails.pcoord) {
+      map.setFilter(layer, ['==', 'Name', ''])
+      dispatch(removeSelectedProperty())
+    } else if (Name) {
+      map.setFilter(layer, ['==', 'Name', Name])
+      dispatch(setSelectedProperty(property))
+    }
+  })
+}
+
+export const hoverProperty = e => (dispatch, getState) => {
+  const { property } = getState()
+  const { Description } = e.features[0].properties
+  const { pcoord, number, street } = getPropertyDescription(Description)
+  if (property.pcoord !== pcoord) {
+    dispatch(updateAddress(number, street, pcoord))
+    dispatch(fetchProperty(pcoord))
+    dispatch(fetchPlace(e.lngLat))
+  }
+}

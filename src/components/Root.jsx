@@ -15,7 +15,9 @@ class Root extends Component {
       <section className="container-fluid h-100 no-bleed">
         <div className="row h-100">
           <SidebarContainer />
-          <MapContainer />
+          <div className="col">
+            <MapContainer />
+          </div>
         </div>
       </section>
     )

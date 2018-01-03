@@ -1,9 +1,11 @@
 import React, { Component } from 'react'
+import { addSources, addLayers } from '../utils/mapUtils'
 
 // Mapbox
 import mapboxgl from 'mapbox-gl'
 import MapboxGeocoder from 'mapbox-gl-geocoder'
 import { MAPBOX_ACCESS_TOKEN } from '../constants/ApiConstants'
+import { additionalBaseLayers } from '../constants/MapConstants'
 
 class Map extends Component {
   render() {
@@ -15,7 +17,14 @@ class Map extends Component {
     )
   }
   componentDidMount() {
-    const { mapFeatures, onLoadMap, updateCoordinates } = this.props
+    const {
+      mapFeatures,
+      storeMapnPopup,
+      updateCoordinates,
+      hoverProperty,
+      hoverPolygon,
+    } = this.props
+
     const { lng, lat, zoom, style } = mapFeatures
 
     mapboxgl.accessToken = MAPBOX_ACCESS_TOKEN
@@ -40,8 +49,34 @@ class Map extends Component {
       }),
     )
 
+    map.addControl(new mapboxgl.NavigationControl(), 'bottom-right')
+
     map.on('load', () => {
-      onLoadMap(map, popup)
+      storeMapnPopup(map, popup)
+      addSources(map)
+      addLayers(map)
+
+      additionalBaseLayers.map(({ source, filter }) => {
+        map.on('mousemove', `${source}-fill`, e => {
+          const feature = e.features[0]
+          const src = feature.layer.source
+
+          if (src === 'properties') {
+            hoverProperty(e)
+          } else if (src === 'census-tracts' || src === 'dissemination_area') {
+            hoverPolygon(e)
+          }
+
+          const filterName = feature.properties[filter]
+          map.setFilter(`${source}-fill-hover`, ['==', filter, filterName])
+          map.setFilter(`${source}-line-hover`, ['==', filter, filterName])
+        })
+        map.on('mouseleave', `${source}-fill`, () => {
+          map.setFilter(`${source}-fill-hover`, ['==', filter, ''])
+          map.setFilter(`${source}-line-hover`, ['==', filter, ''])
+        })
+        return true
+      })
     })
 
     map.on('move', () => {

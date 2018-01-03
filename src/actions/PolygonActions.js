@@ -1,6 +1,7 @@
 import * as types from '../constants/ActionTypes'
 import { HOUSEHOLD_INCOME_URL, RENT_URL } from '../constants/ApiConstants'
 import { apiFetch } from '../utils/apiUtils'
+import { fetchPlace } from '../actions/PropertyActions'
 
 export const fetchIncome = ctuid => async dispatch => {
   const url = `${HOUSEHOLD_INCOME_URL.replace(':id', ctuid)}`
@@ -55,3 +56,18 @@ export const updatePolgyonIds = (ctuid, ctname) => ({
   ctuid,
   ctname,
 })
+
+export const hoverPolygon = e => (dispatch, getState) => {
+  const { polygon } = getState()
+  const { properties } = e.features[0]
+  const ctuid = properties['CTUID']
+  const ctname = properties['CTNAME']
+
+  if (polygon.ctuid !== ctuid) {
+    dispatch(fetchIncome(ctuid))
+    dispatch(fetchPlace(e.lngLat))
+    dispatch(fetchRent(ctname))
+  }
+
+  dispatch(updatePolgyonIds(ctuid, ctname))
+}

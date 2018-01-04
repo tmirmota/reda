@@ -64,7 +64,7 @@ class Map extends Component {
           if (src === 'properties') {
             hoverProperty(e)
           } else if (src === 'census-tracts' || src === 'dissemination_area') {
-            hoverPolygon(e)
+            // hoverPolygon(e)
           }
 
           const filterName = feature.properties[filter]

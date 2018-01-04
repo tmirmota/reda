@@ -4,7 +4,7 @@ const initialState = {
   style: 'styles/mapbox/basic-v9',
   lat: 49.2532,
   lng: -123.1113,
-  zoom: 17,
+  zoom: 13.5,
 }
 
 const map = (state = initialState, action) => {

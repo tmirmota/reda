@@ -7,4 +7,4 @@ export const MAPBOX_ACCESS_TOKEN =
 export const REVERSE_GEOCODE_URL = `${HOST_MAPBOX}/geocoding/v5/mapbox.places/:query.json?access_token=${MAPBOX_ACCESS_TOKEN}`
 export const LAND_COORD_URL = `${HOST_REDA}/land-coordinate/:id`
 export const HOUSEHOLD_INCOME_URL = `${HOST_REDA}/total-household-income/:id`
-export const RENT_URL = `${HOST_REDA}/rental-ct/:id`
+export const RENT_URL = `${HOST_REDA}/rent?ctname=:ctname`

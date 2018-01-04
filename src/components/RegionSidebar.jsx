@@ -1,8 +1,9 @@
 import React from 'react'
+import Button from 'material-ui/Button'
 
 import { toCAD } from '../utils/formatUtils'
 
-const RegionSidebar = ({ property, polygon }) => {
+const RegionSidebar = ({ property, polygon, heatmap }) => {
   const { neighborhood, city, zone, zoneUrl, zoneCategory } = property
   const {
     averageRent,
@@ -53,6 +54,7 @@ const RegionSidebar = ({ property, polygon }) => {
       </div>
       <div>{zoneCategory}</div>
       <hr />
+      <Button onClick={heatmap}>Heat Map</Button>
     </div>
   )
 }

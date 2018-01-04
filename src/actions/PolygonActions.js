@@ -21,7 +21,7 @@ export const fetchIncome = ctuid => async dispatch => {
 }
 
 export const fetchRent = ctuid => async dispatch => {
-  const url = `${RENT_URL.replace('id', ctuid)}`
+  const url = `${RENT_URL.replace(':id', ctuid)}`
   const { json } = await apiFetch(url)
   if (json) {
     if (json.length > 0) {

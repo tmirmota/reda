@@ -1,7 +1,11 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import Map from '../components/Map'
-import { storeMapnPopup, updateCoordinates } from '../actions/MapActions'
+import {
+  storeMapnPopup,
+  updateCoordinates,
+  addDataLayer,
+} from '../actions/MapActions'
 import { hoverProperty } from '../actions/PropertyActions'
 import { hoverPolygon } from '../actions/PolygonActions'
 
@@ -14,4 +18,5 @@ export default connect(mapStateToProps, {
   updateCoordinates,
   hoverProperty,
   hoverPolygon,
+  addDataLayer,
 })(MapComponent)

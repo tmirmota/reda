@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import Sidebar from '../components/Sidebar'
-import { heatmap } from '../actions/MapActions'
+import { addDataLayer } from '../actions/MapActions'
 
 const SidebarComponent = props => <Sidebar {...props} />
 
@@ -19,4 +19,4 @@ const mapStateToProps = ({
   mapFeatures,
 })
 
-export default connect(mapStateToProps, { heatmap })(SidebarComponent)
+export default connect(mapStateToProps, { addDataLayer })(SidebarComponent)

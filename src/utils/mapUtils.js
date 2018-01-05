@@ -17,28 +17,40 @@ export const addLayers = map => {
     ({ source, sourceLayer, minzoom, maxzoom, filter }) => {
       return additionalBaseStyles.map(({ id, type, paint, hasFilter }) => {
         if (hasFilter) {
-          return map.addLayer({
-            id: `${source}${id}`,
-            'source-layer': sourceLayer,
-            source,
-            minzoom,
-            maxzoom,
-            type,
-            paint,
-            filter: ['==', filter, ''],
-          })
+          return map.addLayer(
+            {
+              id: `${source}${id}`,
+              'source-layer': sourceLayer,
+              source,
+              minzoom,
+              maxzoom,
+              type,
+              paint,
+              filter: ['==', filter, ''],
+            },
+            'water',
+          )
         } else {
-          return map.addLayer({
-            id: `${source}${id}`,
-            'source-layer': sourceLayer,
-            source,
-            minzoom,
-            maxzoom,
-            type,
-            paint,
-          })
+          return map.addLayer(
+            {
+              id: `${source}${id}`,
+              'source-layer': sourceLayer,
+              source,
+              minzoom,
+              maxzoom,
+              type,
+              paint,
+            },
+            'water',
+          )
         }
       })
     },
   )
 }
+
+export const getMaxValue = (json, metric) =>
+  json.reduce(
+    (max, row) => (row[metric] > max ? row[metric] : max),
+    json[0][metric],
+  )

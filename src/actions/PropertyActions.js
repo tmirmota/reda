@@ -1,5 +1,8 @@
 import * as types from '../constants/ActionTypes'
-import { REVERSE_GEOCODE_URL, LAND_COORD_URL } from '../constants/ApiConstants'
+import {
+  REVERSE_GEOCODE_URL,
+  PROPERTY_TAX_URL,
+} from '../constants/ApiConstants'
 import { apiFetch } from '../utils/apiUtils'
 import {
   getPropertyDescription,
@@ -24,7 +27,7 @@ export const fetchPlace = lngLat => async dispatch => {
 }
 
 const fetchProperty = pcoord => async dispatch => {
-  const url = `${LAND_COORD_URL.replace(':id', pcoord)}`
+  const url = `${PROPERTY_TAX_URL.replace(':pcoord', pcoord)}`
   const { json } = await apiFetch(url)
   if (json) {
     if (json.length > 0) {

@@ -3,7 +3,7 @@ import Button from 'material-ui/Button'
 
 import { toCAD } from '../utils/formatUtils'
 
-const RegionSidebar = ({ property, polygon, heatmap }) => {
+const RegionSidebar = ({ property, polygon, addDataLayer }) => {
   const { neighborhood, city, zone, zoneUrl, zoneCategory } = property
   const {
     averageRent,
@@ -27,34 +27,7 @@ const RegionSidebar = ({ property, polygon, heatmap }) => {
         <span>Average Rent</span>
         <span className="float-right">{toCAD(averageRent.total)}</span>
       </div>
-      <div>
-        <span>Median Rent</span>
-        <span className="float-right">{toCAD(medianRent.total)}</span>
-      </div>
-      <div>
-        <span>Vacancy Rate</span>
-        <span className="float-right">{vacancyStr}</span>
-      </div>
-      <hr />
-      <div className="sidebar-heading text-uppercase">
-        <strong>Population Details</strong>
-      </div>
-      <div>
-        <span>Household Income</span>
-        <span className="float-right">{toCAD(medianTotalHouseholdIncome)}</span>
-      </div>
-      <hr />
-      <div className="sidebar-heading text-uppercase">
-        <strong>Zoning</strong>
-      </div>
-      <div>
-        <a href={zoneUrl} target="_blank">
-          {zone}
-        </a>
-      </div>
-      <div>{zoneCategory}</div>
-      <hr />
-      <Button onClick={heatmap}>Heat Map</Button>
+      <Button onClick={addDataLayer}>Heat Map</Button>
     </div>
   )
 }

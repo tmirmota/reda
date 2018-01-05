@@ -50,11 +50,11 @@ export const additionalBaseLayers = [
     filter: 'CTUID',
   },
   // {
-  //   source: 'dissemination_area',
+  //   source: 'dissemination-area',
   //   sourceLayer: 'dissemination_areageojson',
-  //   minzoom: 13,
-  //   maxzoom: 15,
-  //   filter: 'DAUID'
+  //   minzoom: 11,
+  //   maxzoom: 14,
+  //   filter: 'DAUID',
   // },
   {
     source: 'properties',
@@ -70,31 +70,36 @@ export const additionalBaseStyles = [
     id: '-fill',
     type: 'fill',
     paint: {
-      'fill-opacity': 0.2,
-      'fill-color': '#3f51b5',
+      'fill-opacity': 0.1,
+      'fill-color': '#651fff',
     },
-  },
-  {
-    id: '-line',
-    type: 'line',
-    paint: {
-      'line-color': '#7986cb',
-    },
+    hasFilter: false,
   },
   {
     id: '-fill-hover',
     type: 'fill',
     paint: {
       'fill-opacity': 0.5,
-      'fill-color': '#1de9b6',
+      'fill-color': '#64ffda',
     },
     hasFilter: true,
+  },
+  {
+    id: '-line',
+    type: 'line',
+    paint: {
+      'line-color': '#651fff',
+      'line-opacity': 0.1,
+      'line-width': 2,
+    },
   },
   {
     id: '-line-hover',
     type: 'line',
     paint: {
-      'line-color': '#1de9b6',
+      'line-color': '#64ffda',
+      'line-opacity': 0.5,
+      'line-width': 2,
     },
     hasFilter: true,
   },
@@ -102,7 +107,7 @@ export const additionalBaseStyles = [
     id: '-fill-click',
     type: 'fill',
     paint: {
-      'fill-color': '#e9291d',
+      'fill-color': '#f50057',
     },
     hasFilter: true,
   },

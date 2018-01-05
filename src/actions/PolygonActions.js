@@ -1,10 +1,11 @@
 import * as types from '../constants/ActionTypes'
-import { HOUSEHOLD_INCOME_URL, RENT_URL } from '../constants/ApiConstants'
+import { INCOME_URL, RENT_URL } from '../constants/ApiConstants'
 import { apiFetch } from '../utils/apiUtils'
 import { fetchPlace } from '../actions/PropertyActions'
+import { getRent } from '../utils/placeUtils'
 
 export const fetchIncome = ctuid => async dispatch => {
-  const url = `${HOUSEHOLD_INCOME_URL.replace(':id', ctuid)}`
+  const url = `${INCOME_URL.replace(':id', ctuid)}`
   const { json } = await apiFetch(url)
   if (json) {
     if (json.length > 0) {
@@ -58,16 +59,19 @@ export const updatePolgyonIds = (ctuid, ctname) => ({
 })
 
 export const hoverPolygon = e => (dispatch, getState) => {
-  const { polygon } = getState()
+  const { polygon, mapFeatures } = getState()
   const { properties } = e.features[0]
   const ctuid = properties['CTUID']
   const ctname = properties['CTNAME']
 
-  if (polygon.ctuid !== ctuid) {
-    dispatch(fetchIncome(ctuid))
-    dispatch(fetchPlace(e.lngLat))
-    dispatch(fetchRent(ctname))
-  }
+  const rent = getRent(mapFeatures.heatmap, ctname)
+
+  // if (polygon.ctuid !== ctuid) {
+  //   dispatch(fetchIncome(ctuid))
+  //   dispatch(fetchPlace(e.lngLat))
+  //   dispatch(fetchRent(ctname))
+  // }
 
   dispatch(updatePolgyonIds(ctuid, ctname))
+  dispatch({ type: types.UPDATE_RENT, rent })
 }

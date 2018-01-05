@@ -23,9 +23,10 @@ class Map extends Component {
       updateCoordinates,
       hoverProperty,
       hoverPolygon,
+      addDataLayer,
     } = this.props
 
-    const { lng, lat, zoom, style } = mapFeatures
+    const { lng, lat, zoom, style, maxBounds } = mapFeatures
 
     mapboxgl.accessToken = MAPBOX_ACCESS_TOKEN
 
@@ -34,6 +35,7 @@ class Map extends Component {
       style: `mapbox://${style}`,
       center: [lng, lat],
       zoom,
+      maxBounds,
     })
 
     const popup = new mapboxgl.Popup({
@@ -58,13 +60,14 @@ class Map extends Component {
 
       additionalBaseLayers.map(({ source, filter }) => {
         map.on('mousemove', `${source}-fill`, e => {
+          console.log(e.lngLat)
           const feature = e.features[0]
           const src = feature.layer.source
 
           if (src === 'properties') {
             hoverProperty(e)
           } else if (src === 'census-tracts' || src === 'dissemination_area') {
-            // hoverPolygon(e)
+            hoverPolygon(e)
           }
 
           const filterName = feature.properties[filter]

@@ -48,9 +48,3 @@ export const addLayers = map => {
     },
   )
 }
-
-export const getMaxValue = (json, metric) =>
-  json.reduce(
-    (max, row) => (row[metric] > max ? row[metric] : max),
-    json[0][metric],
-  )

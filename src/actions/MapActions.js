@@ -1,7 +1,7 @@
 import * as types from '../constants/ActionTypes'
 import { RENT_URL } from '../constants/ApiConstants'
 import { apiFetch } from '../utils/apiUtils'
-import { getMaxValue } from '../utils/mapUtils'
+import { getMinValue, getMaxValue } from '../utils/commonUtils'
 
 export const updateCoordinates = map => dispatch => {
   const { lng, lat } = map.getCenter()
@@ -35,16 +35,18 @@ export const addDataLayer = () => async (dispatch, getState) => {
   const { json } = await apiFetch(url)
   if (json) {
     const metric = 'AVERAGE_RENT_TOTAL'
+    const minValue = getMinValue(json, metric)
     const maxValue = getMaxValue(json, metric)
 
     let stops = []
     json.forEach(row => {
-      var percent = row[metric] / maxValue
+      var percent = (row[metric] - minValue) / (maxValue - minValue)
       const color = `rgba(124, 77, 255,${percent})`
 
       stops.push([row['CTUID'], color])
     })
 
+    console.log(minValue)
     console.log(json)
     console.log(stops)
 

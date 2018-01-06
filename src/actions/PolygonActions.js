@@ -2,7 +2,7 @@ import * as types from '../constants/ActionTypes'
 import { INCOME_URL, RENT_URL } from '../constants/ApiConstants'
 import { apiFetch } from '../utils/apiUtils'
 import { fetchPlace } from '../actions/PropertyActions'
-import { getRent } from '../utils/placeUtils'
+import { findRentResponse, getRents } from '../utils/placeUtils'
 
 export const fetchIncome = ctuid => async dispatch => {
   const url = `${INCOME_URL.replace(':id', ctuid)}`
@@ -26,28 +26,9 @@ export const fetchRent = ctuid => async dispatch => {
   const { json } = await apiFetch(url)
   if (json) {
     if (json.length > 0) {
-      const averageRent = {
-        bachelor: json[0]['AVERAGE_RENT_BACHELOR'],
-        bedroom1: json[0]['AVERAGE_RENT_BEDROOM_1'],
-        bedroom2: json[0]['AVERAGE_RENT_BEDROOM_2'],
-        bedroom3: json[0]['AVERAGE_RENT_BEDROOM_3_PLUS'],
-        total: json[0]['AVERAGE_RENT_TOTAL'],
-      }
-      const medianRent = {
-        bachelor: json[0]['MEDIAN_RENT_BACHELOR'],
-        bedroom1: json[0]['MEDIAN_RENT_BEDROOM_1'],
-        bedroom2: json[0]['MEDIAN_RENT_BEDROOM_2'],
-        bedroom3: json[0]['MEDIAN_RENT_BEDROOM_3_PLUS'],
-        total: json[0]['MEDIAN_RENT_TOTAL'],
-      }
-      const vacancyRate = {
-        bachelor: json[0]['VACANCY_RATE_BACHELOR'],
-        bedroom1: json[0]['VACANCY_RATE_BEDROOM_1'],
-        bedroom2: json[0]['VACANCY_RATE_BEDROOM_2'],
-        bedroom3: json[0]['VACANCY_RATE_BEDROOM_3_PLUS'],
-        total: json[0]['VACANCY_RATE_TOTAL'],
-      }
-      dispatch({ type: types.FETCH_RENT, averageRent, medianRent, vacancyRate })
+      const rents = getRents(json[0])
+
+      dispatch({ type: types.FETCH_RENT, rents })
     }
   }
 }
@@ -63,8 +44,13 @@ export const hoverPolygon = e => (dispatch, getState) => {
   const { properties } = e.features[0]
   const ctuid = properties['CTUID']
   const ctname = properties['CTNAME']
+  console.log(mapFeatures)
 
-  const rent = getRent(mapFeatures.heatmap, ctname)
+  const rentResponse = findRentResponse(mapFeatures.rents, ctname)
+  if (rentResponse) {
+    const rents = getRents(rentResponse)
+    dispatch({ type: types.UPDATE_RENT, rents })
+  }
 
   // if (polygon.ctuid !== ctuid) {
   //   dispatch(fetchIncome(ctuid))
@@ -73,5 +59,4 @@ export const hoverPolygon = e => (dispatch, getState) => {
   // }
 
   dispatch(updatePolgyonIds(ctuid, ctname))
-  dispatch({ type: types.UPDATE_RENT, rent })
 }

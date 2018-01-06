@@ -28,7 +28,7 @@ export const addLayers = map => {
               paint,
               filter: ['==', filter, ''],
             },
-            'water',
+            'place-neighbourhood',
           )
         } else {
           return map.addLayer(
@@ -41,10 +41,52 @@ export const addLayers = map => {
               type,
               paint,
             },
-            'water',
+            'place-neighbourhood',
           )
         }
       })
     },
+  )
+}
+
+export const addHeatMapLayers = (map, fillStops, hoverStops, property) => {
+  map.addLayer(
+    {
+      id: `census-tracts-fill`,
+      source: 'census-tracts',
+      'source-layer': 'census_tracts_2016geojson',
+      minzoom: 9,
+      maxzoom: 14,
+      type: 'fill',
+      paint: {
+        'fill-color': {
+          property: 'CTNAME',
+          type: 'categorical',
+          default: 'transparent',
+          stops: fillStops,
+        },
+      },
+    },
+    'water',
+  )
+  map.addLayer(
+    {
+      id: `census-tracts-fill-hover`,
+      source: 'census-tracts',
+      'source-layer': 'census_tracts_2016geojson',
+      minzoom: 9,
+      maxzoom: 14,
+      type: 'fill',
+      paint: {
+        'fill-color': {
+          property: 'CTNAME',
+          type: 'categorical',
+          default: 'transparent',
+          stops: hoverStops,
+        },
+      },
+      filter: ['==', 'CTUID', ''],
+    },
+    'water',
   )
 }

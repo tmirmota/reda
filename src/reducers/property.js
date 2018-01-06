@@ -56,6 +56,9 @@ const property = (state = initialState, action) => {
         totalAssessment: action.totalAssessment,
       }
 
+    case types.CLEAR_STATE:
+      return initialState
+
     default:
       return state
   }

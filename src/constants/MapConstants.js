@@ -56,13 +56,13 @@ export const additionalBaseLayers = [
   //   maxzoom: 14,
   //   filter: 'DAUID',
   // },
-  {
-    source: 'properties',
-    sourceLayer: 'property_parcel_polygonsgeojson',
-    minzoom: 14,
-    maxzoom: 22,
-    filter: 'Name',
-  },
+  // {
+  //   source: 'properties',
+  //   sourceLayer: 'property_parcel_polygonsgeojson',
+  //   minzoom: 14,
+  //   maxzoom: 22,
+  //   filter: 'Name',
+  // },
 ]
 
 export const additionalBaseStyles = [

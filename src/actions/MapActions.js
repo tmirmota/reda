@@ -2,6 +2,11 @@ import * as types from '../constants/ActionTypes'
 import { RENT_URL } from '../constants/ApiConstants'
 import { apiFetch } from '../utils/apiUtils'
 import { getMinValue, getMaxValue } from '../utils/commonUtils'
+import { addHeatMapLayers } from '../utils/mapUtils'
+
+export const clearState = () => ({
+  type: types.CLEAR_STATE,
+})
 
 export const updateCoordinates = map => dispatch => {
   const { lng, lat } = map.getCenter()
@@ -14,61 +19,46 @@ export const storeMapnPopup = (map, popup) => ({
   popup,
 })
 
-export const addDataLayer = () => async (dispatch, getState) => {
-  const state = getState()
-  const { map } = state.mapFeatures
+export const addHeatMap = json => (dispatch, getState) => {
+  const { mapFeatures } = getState()
+  const { map, heatmapMetric } = mapFeatures
+  const minValue = getMinValue(json, heatmapMetric)
+  const maxValue = getMaxValue(json, heatmapMetric)
 
-  const features = map.querySourceFeatures('census-tracts', {
-    sourceLayer: 'census_tracts_2016geojson',
-    filter: ['==', 'CMANAME', 'Vancouver'],
+  let fillStops = []
+  let hoverStops = []
+  json.forEach(row => {
+    const percent =
+      row[heatmapMetric] > 0
+        ? (row[heatmapMetric] - minValue) / (maxValue - minValue)
+        : 0
+    const percentRed = (percent * 255 - 255) * -1
+    const showPercent = percent > 0 ? 0.5 : 0
+
+    const fill = `rgba(255, ${percentRed}, 0, ${showPercent})`
+    const hover = `rgba(0, 255, 254, ${showPercent})`
+
+    fillStops.push([row['CTUID'], fill])
+    hoverStops.push([row['CTUID'], hover])
   })
-  console.log(features)
-  console.log(map.getSource('census-tracts'))
+  addHeatMapLayers(map, fillStops, hoverStops, 'CTNAME')
+}
 
-  const property = 'CTNAME'
-  let ctnames = []
+export const fetchDataLayers = () => async (dispatch, getState) => {
+  const { mapFeatures } = getState()
+  const { map, heatmapMetric } = mapFeatures
+
+  const features = map.queryRenderedFeatures({
+    layers: ['census-tracts-2016geojson'],
+  })
+  let arrCtnames = []
   features.map(({ properties }) => {
-    ctnames.push(properties[property])
+    arrCtnames.push(properties['CTNAME'])
   })
-
-  const url = `${RENT_URL.replace(':ctname', ctnames)}`
+  const url = `${RENT_URL.replace(':ctname', arrCtnames)}`
   const { json } = await apiFetch(url)
   if (json) {
-    const metric = 'AVERAGE_RENT_TOTAL'
-    const minValue = getMinValue(json, metric)
-    const maxValue = getMaxValue(json, metric)
-
-    let stops = []
-    json.forEach(row => {
-      var percent = (row[metric] - minValue) / (maxValue - minValue)
-      const color = `rgba(124, 77, 255,${percent})`
-
-      stops.push([row['CTUID'], color])
-    })
-
-    console.log(minValue)
-    console.log(json)
-    console.log(stops)
-
-    map.addLayer(
-      {
-        id: `census-tracts-fill`,
-        source: 'census-tracts',
-        'source-layer': 'census_tracts_2016geojson',
-        minzoom: 9,
-        maxzoom: 14,
-        type: 'fill',
-        paint: {
-          'fill-color': {
-            property: 'CTNAME',
-            type: 'categorical',
-            default: 'transparent',
-            stops: stops,
-          },
-        },
-      },
-      'water',
-    )
-    dispatch({ type: types.UPDATE_HEATMAP_DATA, heatmap: json })
+    dispatch(addHeatMap(json))
+    dispatch({ type: types.FETCH_RENTS, rents: json })
   }
 }

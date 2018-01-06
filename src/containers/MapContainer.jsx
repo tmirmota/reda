@@ -4,7 +4,8 @@ import Map from '../components/Map'
 import {
   storeMapnPopup,
   updateCoordinates,
-  addDataLayer,
+  fetchDataLayers,
+  clearState,
 } from '../actions/MapActions'
 import { hoverProperty } from '../actions/PropertyActions'
 import { hoverPolygon } from '../actions/PolygonActions'
@@ -18,5 +19,6 @@ export default connect(mapStateToProps, {
   updateCoordinates,
   hoverProperty,
   hoverPolygon,
-  addDataLayer,
+  fetchDataLayers,
+  clearState,
 })(MapComponent)

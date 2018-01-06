@@ -23,7 +23,8 @@ class Map extends Component {
       updateCoordinates,
       hoverProperty,
       hoverPolygon,
-      addDataLayer,
+      fetchDataLayers,
+      clearState,
     } = this.props
 
     const { lng, lat, zoom, style, maxBounds } = mapFeatures
@@ -55,35 +56,23 @@ class Map extends Component {
 
     map.on('load', () => {
       storeMapnPopup(map, popup)
+      fetchDataLayers()
       addSources(map)
-      addLayers(map)
+      // addLayers(map)
 
-      additionalBaseLayers.map(({ source, filter }) => {
-        map.on('mousemove', `${source}-fill`, e => {
-          console.log(e.lngLat)
-          const feature = e.features[0]
-          const src = feature.layer.source
-
-          if (src === 'properties') {
-            hoverProperty(e)
-          } else if (src === 'census-tracts' || src === 'dissemination_area') {
-            hoverPolygon(e)
-          }
-
-          const filterName = feature.properties[filter]
-          map.setFilter(`${source}-fill-hover`, ['==', filter, filterName])
-          map.setFilter(`${source}-line-hover`, ['==', filter, filterName])
-        })
-        map.on('mouseleave', `${source}-fill`, () => {
-          map.setFilter(`${source}-fill-hover`, ['==', filter, ''])
-          map.setFilter(`${source}-line-hover`, ['==', filter, ''])
-        })
-        return true
+      map.on('mousemove', 'census-tracts-fill', e => {
+        const filterName = e.features[0].properties['CTUID']
+        map.setFilter('census-tracts-fill-hover', ['==', 'CTUID', filterName])
+        hoverPolygon(e)
       })
-    })
+      map.on('mouseleave', 'census-tracts-fill', () => {
+        map.setFilter('census-tracts-fill-hover', ['==', 'CTUID', ''])
+        clearState()
+      })
 
-    map.on('move', () => {
-      updateCoordinates(map)
+      map.on('move', () => {
+        updateCoordinates(map)
+      })
     })
   }
 }

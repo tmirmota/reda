@@ -48,10 +48,9 @@ const polygon = (state = initialState, action) => {
     case types.UPDATE_RENT:
       return {
         ...state,
-        averageRent: {
-          ...state.averageRent,
-          total: action.rent,
-        },
+        averageRent: action.rents.averageRent,
+        medianRent: action.rents.medianRent,
+        vacancyRate: action.rents.vacancyRate,
       }
 
     case types.UPDATE_POLYGON_IDS:
@@ -60,6 +59,9 @@ const polygon = (state = initialState, action) => {
         ctuid: action.ctuid,
         ctname: action.ctname,
       }
+
+    case types.CLEAR_STATE:
+      return initialState
 
     default:
       return state

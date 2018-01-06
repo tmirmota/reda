@@ -53,11 +53,31 @@ const polygon = (state = initialState, action) => {
         vacancyRate: action.rents.vacancyRate,
       }
 
+    case types.UPDATE_INCOME:
+      return {
+        ...state,
+        medianTotalHouseholdIncome: action.income,
+      }
+
     case types.UPDATE_POLYGON_IDS:
       return {
         ...state,
         ctuid: action.ctuid,
         ctname: action.ctname,
+      }
+
+    case types.CLEAR_RENT:
+      return {
+        ...state,
+        averageRent: initialState.averageRent,
+        medianRent: initialState.medianRent,
+        vacancyRate: initialState.vacancyRate,
+      }
+
+    case types.CLEAR_INCOME:
+      return {
+        ...state,
+        medianTotalHouseholdIncome: null,
       }
 
     case types.CLEAR_STATE:

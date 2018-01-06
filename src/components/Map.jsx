@@ -56,9 +56,9 @@ class Map extends Component {
 
     map.on('load', () => {
       storeMapnPopup(map, popup)
-      fetchDataLayers()
       addSources(map)
-      // addLayers(map)
+      addLayers(map)
+      fetchDataLayers()
 
       map.on('mousemove', 'census-tracts-fill', e => {
         const filterName = e.features[0].properties['CTUID']
@@ -67,6 +67,16 @@ class Map extends Component {
       })
       map.on('mouseleave', 'census-tracts-fill', () => {
         map.setFilter('census-tracts-fill-hover', ['==', 'CTUID', ''])
+        clearState()
+      })
+
+      map.on('mousemove', 'properties-fill', e => {
+        const filterName = e.features[0].properties['Name']
+        map.setFilter('properties-fill-hover', ['==', 'Name', filterName])
+        hoverProperty(e)
+      })
+      map.on('mouseleave', 'properties-fill', () => {
+        map.setFilter('properties-fill-hover', ['==', 'Name', ''])
         clearState()
       })
 

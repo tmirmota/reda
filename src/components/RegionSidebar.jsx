@@ -35,6 +35,10 @@ const RegionSidebar = ({ property, polygon }) => {
         <span>Vancancy Rate</span>
         <span className="float-right">{vacancyStr}</span>
       </div>
+      <div>
+        <span>Median Household Income</span>
+        <span className="float-right">{toCAD(medianTotalHouseholdIncome)}</span>
+      </div>
     </div>
   )
 }

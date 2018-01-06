@@ -21,7 +21,7 @@ const Sidebar = props => {
   const { zoning, satellite, schools, fireHydrants, transit } = filters
   return (
     <div className="col pt-4 sidebar">
-      {mapFeatures.zoom > 15 ? (
+      {mapFeatures.zoom > 14 ? (
         <PropertySidebar {...props} />
       ) : (
         <RegionSidebar {...props} />

@@ -12,9 +12,6 @@ export const neighborhoodName = features => {
   }
 }
 
-export const findRentResponse = (data, id) =>
-  data.find(row => row['CTUID'] === id)
-
 export const getRents = data => {
   const averageRent = {
     bachelor: data['AVERAGE_RENT_BACHELOR'],

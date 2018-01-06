@@ -42,13 +42,13 @@ export const sources = [
 ]
 
 export const additionalBaseLayers = [
-  {
-    source: 'census-tracts',
-    sourceLayer: 'census_tracts_2016geojson',
-    minzoom: 9,
-    maxzoom: 14,
-    filter: 'CTUID',
-  },
+  // {
+  //   source: 'census-tracts',
+  //   sourceLayer: 'census_tracts_2016geojson',
+  //   minzoom: 9,
+  //   maxzoom: 14,
+  //   filter: 'CTUID',
+  // },
   // {
   //   source: 'dissemination-area',
   //   sourceLayer: 'dissemination_areageojson',
@@ -56,13 +56,13 @@ export const additionalBaseLayers = [
   //   maxzoom: 14,
   //   filter: 'DAUID',
   // },
-  // {
-  //   source: 'properties',
-  //   sourceLayer: 'property_parcel_polygonsgeojson',
-  //   minzoom: 14,
-  //   maxzoom: 22,
-  //   filter: 'Name',
-  // },
+  {
+    source: 'properties',
+    sourceLayer: 'property_parcel_polygonsgeojson',
+    minzoom: 14,
+    maxzoom: 22,
+    filter: 'Name',
+  },
 ]
 
 export const additionalBaseStyles = [

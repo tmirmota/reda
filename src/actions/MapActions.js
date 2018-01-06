@@ -1,5 +1,5 @@
 import * as types from '../constants/ActionTypes'
-import { RENT_URL } from '../constants/ApiConstants'
+import { RENT_URL, INCOME_URL } from '../constants/ApiConstants'
 import { apiFetch } from '../utils/apiUtils'
 import { getMinValue, getMaxValue } from '../utils/commonUtils'
 import { addHeatMapLayers } from '../utils/mapUtils'
@@ -44,6 +44,18 @@ export const addHeatMap = json => (dispatch, getState) => {
   addHeatMapLayers(map, fillStops, hoverStops, 'CTNAME')
 }
 
+export const fetchIncomes = features => async (dispatch, getState) => {
+  let arrCtuid = []
+  features.map(({ properties }) => {
+    arrCtuid.push(properties['CTUID'])
+  })
+  const url = `${INCOME_URL.replace(':ctuid', arrCtuid)}`
+  const { json } = await apiFetch(url)
+  if (json) {
+    dispatch({ type: types.FETCH_INCOMES, incomes: json })
+  }
+}
+
 export const fetchDataLayers = () => async (dispatch, getState) => {
   const { mapFeatures } = getState()
   const { map, heatmapMetric } = mapFeatures
@@ -51,6 +63,7 @@ export const fetchDataLayers = () => async (dispatch, getState) => {
   const features = map.queryRenderedFeatures({
     layers: ['census-tracts-2016geojson'],
   })
+  dispatch(fetchIncomes(features))
   let arrCtnames = []
   features.map(({ properties }) => {
     arrCtnames.push(properties['CTNAME'])

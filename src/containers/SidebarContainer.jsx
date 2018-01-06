@@ -1,6 +1,12 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import Sidebar from '../components/Sidebar'
+import {
+  toggleZoning,
+  toggleTransit,
+  toggleFire,
+  toggleSchools,
+} from '../actions/FilterActions'
 
 const SidebarComponent = props => <Sidebar {...props} />
 
@@ -18,4 +24,9 @@ const mapStateToProps = ({
   mapFeatures,
 })
 
-export default connect(mapStateToProps)(SidebarComponent)
+export default connect(mapStateToProps, {
+  toggleZoning,
+  toggleTransit,
+  toggleFire,
+  toggleSchools,
+})(SidebarComponent)

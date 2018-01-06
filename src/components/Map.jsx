@@ -5,7 +5,6 @@ import { addSources, addLayers } from '../utils/mapUtils'
 import mapboxgl from 'mapbox-gl'
 import MapboxGeocoder from 'mapbox-gl-geocoder'
 import { MAPBOX_ACCESS_TOKEN } from '../constants/ApiConstants'
-import { additionalBaseLayers } from '../constants/MapConstants'
 
 class Map extends Component {
   render() {

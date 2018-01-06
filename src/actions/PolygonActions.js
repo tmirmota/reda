@@ -1,7 +1,6 @@
 import * as types from '../constants/ActionTypes'
 import { INCOME_URL, RENT_URL } from '../constants/ApiConstants'
 import { apiFetch } from '../utils/apiUtils'
-import { fetchPlace } from '../actions/PropertyActions'
 import { getRents } from '../utils/placeUtils'
 
 export const fetchIncome = ctuid => async dispatch => {
@@ -40,7 +39,7 @@ export const updatePolgyonIds = (ctuid, ctname) => ({
 })
 
 export const hoverPolygon = e => (dispatch, getState) => {
-  const { polygon, mapFeatures } = getState()
+  const { mapFeatures } = getState()
   const { rents, incomes } = mapFeatures
   const { properties } = e.features[0]
   const ctuid = Number(properties['CTUID']) * 100
@@ -54,8 +53,6 @@ export const hoverPolygon = e => (dispatch, getState) => {
     dispatch({ type: types.CLEAR_RENT })
   }
 
-  console.log(properties)
-  console.log(incomes)
   const incomeResponse = incomes.find(row => row['ALT_GEO_CODE'] === ctuid)
   if (incomeResponse) {
     dispatch({

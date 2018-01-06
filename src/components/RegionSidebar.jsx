@@ -1,10 +1,9 @@
 import React from 'react'
-import Button from 'material-ui/Button'
 
 import { toCAD } from '../utils/formatUtils'
 
 const RegionSidebar = ({ property, polygon }) => {
-  const { neighborhood, city, zone, zoneUrl, zoneCategory } = property
+  const { neighborhood, city } = property
   const {
     averageRent,
     medianRent,
@@ -37,8 +36,8 @@ const RegionSidebar = ({ property, polygon }) => {
       </div>
       <div>
         <span>Median Household Income</span>
-        <span className="float-right">{toCAD(medianTotalHouseholdIncome)}</span>
       </div>
+      <div className="float-right">{toCAD(medianTotalHouseholdIncome)}</div>
     </div>
   )
 }

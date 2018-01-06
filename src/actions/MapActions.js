@@ -47,7 +47,7 @@ export const addHeatMap = json => (dispatch, getState) => {
 export const fetchIncomes = features => async (dispatch, getState) => {
   let arrCtuid = []
   features.map(({ properties }) => {
-    arrCtuid.push(properties['CTUID'])
+    return arrCtuid.push(properties['CTUID'])
   })
   const url = `${INCOME_URL.replace(':ctuid', arrCtuid)}`
   const { json } = await apiFetch(url)
@@ -58,7 +58,7 @@ export const fetchIncomes = features => async (dispatch, getState) => {
 
 export const fetchDataLayers = () => async (dispatch, getState) => {
   const { mapFeatures } = getState()
-  const { map, heatmapMetric } = mapFeatures
+  const { map } = mapFeatures
 
   const features = map.queryRenderedFeatures({
     layers: ['census-tracts-2016geojson'],
@@ -66,7 +66,7 @@ export const fetchDataLayers = () => async (dispatch, getState) => {
   dispatch(fetchIncomes(features))
   let arrCtnames = []
   features.map(({ properties }) => {
-    arrCtnames.push(properties['CTNAME'])
+    return arrCtnames.push(properties['CTNAME'])
   })
   const url = `${RENT_URL.replace(':ctname', arrCtnames)}`
   const { json } = await apiFetch(url)

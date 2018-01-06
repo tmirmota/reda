@@ -27,3 +27,21 @@
   position: absolute;
   min-height: 100%;
 }
+
+.shadow {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12), 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.bottom-right {
+  position: absolute !important;
+  bottom: 0;
+  right: 0;
+}
+
+.height-small {
+  min-height: 12px;
+}
+
+.width-small {
+  min-width: 225px;
+}

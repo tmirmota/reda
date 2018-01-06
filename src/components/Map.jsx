@@ -49,15 +49,19 @@ class Map extends Component {
         country: 'ca',
         placeholder: 'Search address, street, neighborhood or city',
       }),
+      'top-left',
     )
 
-    map.addControl(new mapboxgl.NavigationControl(), 'bottom-right')
+    map.addControl(new mapboxgl.NavigationControl(), 'top-left')
 
     map.on('load', () => {
       storeMapnPopup(map, popup)
       addSources(map)
       addLayers(map)
       fetchDataLayers()
+
+      map.setLayerZoomRange('road-label-large', 13.5, 22)
+      map.setLayerZoomRange('road-label-medium', 15, 22)
 
       map.on('mousemove', 'census-tracts-fill', e => {
         const filterName = e.features[0].properties['CTUID']

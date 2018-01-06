@@ -20,7 +20,7 @@ const RegionSidebar = ({ property, polygon }) => {
       <div className="text-muted">{city}</div>
       <hr />
       <div className="sidebar-heading text-uppercase">
-        <strong>Rental</strong>
+        <strong>Rental Data</strong>
       </div>
       <div>
         <span>Average Rent</span>
@@ -34,10 +34,26 @@ const RegionSidebar = ({ property, polygon }) => {
         <span>Vancancy Rate</span>
         <span className="float-right">{vacancyStr}</span>
       </div>
+      <div className="text-muted mt-2">
+        Source:{' '}
+        <a href="https://www.cmhc-schl.gc.ca/" target="_blank">
+          CMHC
+        </a>
+      </div>
+      <hr />
+      <div className="sidebar-heading text-uppercase">
+        <strong>Rental Data</strong>
+      </div>
       <div>
         <span>Median Household Income</span>
       </div>
-      <div className="float-right">{toCAD(medianTotalHouseholdIncome)}</div>
+      <div>{toCAD(medianTotalHouseholdIncome)}</div>
+      <div className="text-muted mt-2">
+        Source:{' '}
+        <a href="http://statcan.gc.ca/" target="_blank">
+          Stats Canada
+        </a>
+      </div>
     </div>
   )
 }

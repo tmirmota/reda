@@ -125,15 +125,3 @@ export const zoneFill = {
     'fill-color': '#FFFFFF',
   },
 }
-
-export const zoneLine = {
-  id: 'zoning-line',
-  source: 'zoning',
-  'source-layer': 'zoning_districtsgeojson',
-  minzoom: 11,
-  maxzoom: 22,
-  type: 'line',
-  paint: {
-    'line-color': '#f412da',
-  },
-}

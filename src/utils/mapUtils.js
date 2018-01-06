@@ -76,14 +76,15 @@ export const addHeatMapLayers = (map, fillStops, hoverStops, property) => {
       'source-layer': 'census_tracts_2016geojson',
       minzoom: 9,
       maxzoom: 14,
-      type: 'fill',
+      type: 'line',
       paint: {
-        'fill-color': {
+        'line-color': {
           property: 'CTNAME',
           type: 'categorical',
           default: 'transparent',
-          stops: hoverStops,
+          stops: fillStops,
         },
+        'line-width': 3,
       },
       filter: ['==', 'CTUID', ''],
     },

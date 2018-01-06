@@ -4,6 +4,7 @@ import '../App.css'
 // Containers
 import SidebarContainer from '../containers/SidebarContainer'
 import MapContainer from '../containers/MapContainer'
+import LegendContainer from '../containers/LegendContainer'
 
 // Components
 import ErrorMessage from '../components/ErrorMessage'
@@ -18,6 +19,7 @@ class Root extends Component {
           <div className="col">
             <MapContainer />
           </div>
+          <LegendContainer />
         </div>
       </section>
     )

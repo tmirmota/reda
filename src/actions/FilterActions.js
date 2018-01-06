@@ -4,8 +4,46 @@ import { zoneLine } from '../constants/MapConstants'
 export const toggleZoning = (event, checked) => (dispatch, getState) => {
   const { mapFeatures } = getState()
   const { map } = mapFeatures
+  const features = map.querySourceFeatures('zoning', {
+    sourceLayer: ['zoning_districtsgeojson'],
+  })
+  let arrNames = []
+  features.map(({ properties }) => {
+    const { Name } = properties
+    if (arrNames.indexOf(Name) === -1) {
+      arrNames.push(Name)
+    }
+  })
+  console.log(arrNames.sort())
+  let stops = []
+  arrNames.map((name, index) => {
+    const percent = index / arrNames.length
+    const r = (percent * 255).toFixed()
+    const color = `rgba(${r},0,255,1)`
+    stops.push([name, color])
+  })
+  console.log(stops)
   if (checked) {
-    map.addLayer(zoneLine)
+    map.addLayer(
+      {
+        id: 'zoning-line',
+        source: 'zoning',
+        'source-layer': 'zoning_districtsgeojson',
+        minzoom: 11,
+        maxzoom: 22,
+        type: 'line',
+        paint: {
+          'line-color': {
+            property: 'Name',
+            type: 'categorical',
+            default: 'transparent',
+            stops: stops,
+          },
+          'line-width': 2,
+        },
+      },
+      'water',
+    )
   } else {
     map.removeLayer('zoning-line')
   }

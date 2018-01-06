@@ -65,6 +65,19 @@ const fetchProperty = pcoord => async dispatch => {
   }
 }
 
+export const queryNeighborhood = e => (dispatch, getState) => {
+  const { map } = getState().mapFeatures
+  const vanFeatures = map.queryRenderedFeatures(e.point, {
+    layers: ['van-neighborhoodsgeojson'],
+  })
+  if (vanFeatures.length > 0) {
+    const { Name } = vanFeatures[0].properties
+    dispatch({ type: types.UPDATE_NEIGHBORHOOD, neighborhood: Name })
+  } else {
+    dispatch({ type: types.UPDATE_NEIGHBORHOOD, neighborhood: null })
+  }
+}
+
 const updateAddress = (number, street, pcoord) => ({
   type: types.UPDATE_ADDRESS,
   number,

@@ -2,6 +2,8 @@ import * as types from '../constants/ActionTypes'
 import { INCOME_URL, RENT_URL } from '../constants/ApiConstants'
 import { apiFetch } from '../utils/apiUtils'
 import { getRents } from '../utils/placeUtils'
+import { toCAD } from '../utils/formatUtils'
+import { queryNeighborhood } from '../actions/PropertyActions'
 
 export const fetchIncome = ctuid => async dispatch => {
   const url = `${INCOME_URL.replace(':id', ctuid)}`
@@ -38,12 +40,43 @@ export const updatePolgyonIds = (ctuid, ctname) => ({
   ctname,
 })
 
+export const displayPopup = (location, layer) => (dispatch, getState) => {
+  const { property, polygon, mapFeatures } = getState()
+  const { averageRent } = polygon
+  const { map, popup } = mapFeatures
+  popup.remove()
+  map.getCanvas().style.cursor = ''
+
+  const features = map.queryRenderedFeatures(location.point, {
+    layers: ['census-tracts-2016geojson'],
+  })
+  const value = polygon.averageRent.total
+  if (features.length > 0 && value > 0) {
+    const { neighborhood } = property
+    map.getCanvas().style.cursor = 'pointer'
+
+    const popupText = `
+      <div>
+        Average Rent: ${toCAD(value)}
+        <br/>
+        <div class="text-muted">In ${neighborhood}</div>
+      </div>`
+    popup
+      .setLngLat(location.lngLat)
+      .setHTML(popupText)
+      .addTo(map)
+  }
+}
+
 export const hoverPolygon = e => (dispatch, getState) => {
   const { mapFeatures } = getState()
-  const { rents, incomes } = mapFeatures
+  const { map, rents, incomes } = mapFeatures
   const { properties } = e.features[0]
   const ctuid = Number(properties['CTUID']) * 100
   const ctname = properties['CTNAME']
+
+  dispatch(displayPopup(e, 'census_tracts_2016geojson'))
+  dispatch(queryNeighborhood(e))
 
   const rentResponse = rents.find(row => row['CTUID'] === ctname)
   if (rentResponse) {

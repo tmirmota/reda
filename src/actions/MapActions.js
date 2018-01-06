@@ -24,31 +24,34 @@ export const addHeatMap = json => (dispatch, getState) => {
   const { map, heatmapMetric } = mapFeatures
   const minValue = getMinValue(json, heatmapMetric)
   const maxValue = getMaxValue(json, heatmapMetric)
-  console.log(maxValue)
 
   let fillStops = []
   let hoverStops = []
+  let beginColor
+  let endColor
+
   json.forEach(row => {
-    const percent =
-      row[heatmapMetric] > 0
-        ? (row[heatmapMetric] - minValue) / (maxValue - minValue)
-        : 0
-    const percentRed = ((percent * 255 - 255) * -1).toFixed()
-    const showPercent = percent > 0 ? 0.5 : 0
+    const value = row[heatmapMetric]
+    if (value > 0) {
+      const percent = (value - minValue) / (maxValue - minValue)
+      const percentRed = ((percent * 255 - 255) * -1).toFixed()
+      const fill = `rgba(255, ${percentRed}, 0, 0.5)`
+      const hover = `rgba(0, 255, 254, 0.5)`
 
-    const fill = `rgba(255, ${percentRed}, 0, ${showPercent})`
-    const hover = `rgba(0, 255, 254, ${showPercent})`
+      if (value === minValue) return (beginColor = fill)
+      if (value === maxValue) return (endColor = fill)
 
-    fillStops.push([row['CTUID'], fill])
-    hoverStops.push([row['CTUID'], hover])
+      fillStops.push([row['CTUID'], fill])
+      hoverStops.push([row['CTUID'], hover])
+    }
   })
 
   dispatch({
     type: types.UPDATE_LEGEND,
     minValue,
     maxValue,
-    beginColor: fillStops[fillStops.length - 1][1],
-    endColor: fillStops[0][1],
+    beginColor,
+    endColor,
   })
   addHeatMapLayers(map, fillStops, hoverStops, 'CTNAME')
 }

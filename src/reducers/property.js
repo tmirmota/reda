@@ -56,6 +56,12 @@ const property = (state = initialState, action) => {
         totalAssessment: action.totalAssessment,
       }
 
+    case types.UPDATE_NEIGHBORHOOD:
+      return {
+        ...state,
+        neighborhood: action.neighborhood,
+      }
+
     case types.CLEAR_STATE:
       return initialState
 

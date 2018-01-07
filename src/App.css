@@ -45,3 +45,7 @@
 .width-small {
   min-width: 225px;
 }
+
+.width-150 {
+  min-width: 150px !important;
+}

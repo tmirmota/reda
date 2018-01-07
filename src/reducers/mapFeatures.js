@@ -11,7 +11,8 @@ const initialState = {
   ],
   rents: [],
   incomes: [],
-  heatmapMetric: 'AVERAGE_RENT_TOTAL',
+  metricType: 'BEDROOM_2',
+  metricName: 'AVERAGE_RENT',
 }
 
 const map = (state = initialState, action) => {
@@ -42,6 +43,12 @@ const map = (state = initialState, action) => {
       return {
         ...state,
         incomes: action.incomes,
+      }
+
+    case types.UPDATE_HEATMAP_DATA:
+      return {
+        ...state,
+        [action.name]: action.value,
       }
 
     default:

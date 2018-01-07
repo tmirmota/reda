@@ -7,13 +7,12 @@ const Legend = ({ legend }) => {
     return false
   }
   const { minValue, maxValue, beginColor, endColor } = legend
-  console.log(beginColor)
   const styles = {
     background: `linear-gradient(to right, ${beginColor}, ${endColor})`,
   }
   return (
     <div className="width-small bottom-right shadow mr-3 mb-4 p-3 bg-white rounded">
-      <div className="text-muted">Average Rent</div>
+      <div className="text-muted">Average Rent Range</div>
       <div style={styles} className="height-small rounded" />
       <div>
         {toCAD(minValue)}

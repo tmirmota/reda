@@ -5,26 +5,26 @@ const initialState = {
   ctname: null,
   altGeoCode: null,
   medianTotalHouseholdIncome: null,
-  averageRent: {
-    bachelor: null,
-    bedroom1: null,
-    bedroom2: null,
-    bedroom3: null,
-    total: null,
+  AVERAGE_RENT: {
+    BACHELOR: null,
+    BEDROOM_1: null,
+    BEDROOM_2: null,
+    BEDROOM_3_PLUS: null,
+    TOTAL: null,
   },
-  medianRent: {
-    bachelor: null,
-    bedroom1: null,
-    bedroom2: null,
-    bedroom3: null,
-    total: null,
+  MEDIAN_RENT: {
+    BACHELOR: null,
+    BEDROOM_1: null,
+    BEDROOM_2: null,
+    BEDROOM_3_PLUS: null,
+    TOTAL: null,
   },
-  vacancyRate: {
-    bachelor: null,
-    bedroom1: null,
-    bedroom2: null,
-    bedroom3: null,
-    total: null,
+  VACANCY_RATE: {
+    BACHELOR: null,
+    BEDROOM_1: null,
+    BEDROOM_2: null,
+    BEDROOM_3_PLUS: null,
+    TOTAL: null,
   },
 }
 
@@ -37,20 +37,12 @@ const polygon = (state = initialState, action) => {
         medianTotalHouseholdIncome: action.medianTotalHouseholdIncome,
       }
 
-    case types.FETCH_RENT:
-      return {
-        ...state,
-        averageRent: action.averageRent,
-        medianRent: action.medianRent,
-        vacancyRate: action.vacancyRate,
-      }
-
     case types.UPDATE_RENT:
       return {
         ...state,
-        averageRent: action.rents.averageRent,
-        medianRent: action.rents.medianRent,
-        vacancyRate: action.rents.vacancyRate,
+        AVERAGE_RENT: action.rents.averageRent,
+        MEDIAN_RENT: action.rents.medianRent,
+        VACANCY_RATE: action.rents.vacancyRate,
       }
 
     case types.UPDATE_INCOME:

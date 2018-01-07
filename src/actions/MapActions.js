@@ -21,9 +21,12 @@ export const storeMapnPopup = (map, popup) => ({
 
 export const addHeatMap = json => (dispatch, getState) => {
   const { mapFeatures } = getState()
-  const { map, heatmapMetric } = mapFeatures
-  const minValue = getMinValue(json, heatmapMetric)
-  const maxValue = getMaxValue(json, heatmapMetric)
+  const { map, metricType, metricName } = mapFeatures
+
+  const metric = `${metricName}_${metricType}`
+
+  const minValue = getMinValue(json, metric)
+  const maxValue = getMaxValue(json, metric)
 
   let fillStops = []
   let hoverStops = []
@@ -31,7 +34,7 @@ export const addHeatMap = json => (dispatch, getState) => {
   let endColor
 
   json.forEach(row => {
-    const value = row[heatmapMetric]
+    const value = row[metric]
     if (value > 0) {
       const percent = (value - minValue) / (maxValue - minValue)
       const percentRed = ((percent * 255 - 255) * -1).toFixed()
@@ -86,4 +89,9 @@ export const fetchDataLayers = () => async (dispatch, getState) => {
     dispatch(addHeatMap(json))
     dispatch({ type: types.FETCH_RENTS, rents: json })
   }
+}
+
+export const changeHeatMap = event => dispatch => {
+  const { name, value } = event.target
+  dispatch({ type: types.UPDATE_HEATMAP_DATA, name, value })
 }

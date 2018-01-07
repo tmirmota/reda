@@ -14,24 +14,24 @@ export const neighborhoodName = features => {
 
 export const getRents = data => {
   const averageRent = {
-    bachelor: data['AVERAGE_RENT_BACHELOR'],
-    bedroom1: data['AVERAGE_RENT_BEDROOM_1'],
-    bedroom2: data['AVERAGE_RENT_BEDROOM_2'],
-    bedroom3: data['AVERAGE_RENT_BEDROOM_3_PLUS'],
+    BACHELOR: data['AVERAGE_RENT_BACHELOR'],
+    BEDROOM_1: data['AVERAGE_RENT_BEDROOM_1'],
+    BEDROOM_2: data['AVERAGE_RENT_BEDROOM_2'],
+    BEDROOM_3_PLUS: data['AVERAGE_RENT_BEDROOM_3_PLUS'],
     total: data['AVERAGE_RENT_TOTAL'],
   }
   const medianRent = {
-    bachelor: data['MEDIAN_RENT_BACHELOR'],
-    bedroom1: data['MEDIAN_RENT_BEDROOM_1'],
-    bedroom2: data['MEDIAN_RENT_BEDROOM_2'],
-    bedroom3: data['MEDIAN_RENT_BEDROOM_3_PLUS'],
+    BACHELOR: data['MEDIAN_RENT_BACHELOR'],
+    BEDROOM_1: data['MEDIAN_RENT_BEDROOM_1'],
+    BEDROOM_2: data['MEDIAN_RENT_BEDROOM_2'],
+    BEDROOM_3_PLUS: data['MEDIAN_RENT_BEDROOM_3_PLUS'],
     total: data['MEDIAN_RENT_TOTAL'],
   }
   const vacancyRate = {
-    bachelor: data['VACANCY_RATE_BACHELOR'],
-    bedroom1: data['VACANCY_RATE_BEDROOM_1'],
-    bedroom2: data['VACANCY_RATE_BEDROOM_2'],
-    bedroom3: data['VACANCY_RATE_BEDROOM_3_PLUS'],
+    BACHELOR: data['VACANCY_RATE_BACHELOR'],
+    BEDROOM_1: data['VACANCY_RATE_BEDROOM_1'],
+    BEDROOM_2: data['VACANCY_RATE_BEDROOM_2'],
+    BEDROOM_3_PLUS: data['VACANCY_RATE_BEDROOM_3_PLUS'],
     total: data['VACANCY_RATE_TOTAL'],
   }
   return { averageRent, medianRent, vacancyRate }

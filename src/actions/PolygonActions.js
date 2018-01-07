@@ -29,7 +29,7 @@ export const fetchRent = ctuid => async dispatch => {
     if (json.length > 0) {
       const rents = getRents(json[0])
 
-      dispatch({ type: types.FETCH_RENT, rents })
+      dispatch({ type: types.UPDATE_RENT, rents })
     }
   }
 }
@@ -42,23 +42,22 @@ export const updatePolgyonIds = (ctuid, ctname) => ({
 
 export const displayPopup = (location, layer) => (dispatch, getState) => {
   const { property, polygon, mapFeatures } = getState()
-  const { averageRent } = polygon
-  const { map, popup } = mapFeatures
+  const { map, popup, metricName, metricType } = mapFeatures
   popup.remove()
   map.getCanvas().style.cursor = ''
 
   const features = map.queryRenderedFeatures(location.point, {
     layers: ['census-tracts-2016geojson'],
   })
-  const value = polygon.averageRent.total
+  const value = polygon[metricName][metricType]
   if (features.length > 0 && value > 0) {
     const { neighborhood } = property
     map.getCanvas().style.cursor = 'pointer'
 
     const popupText = `
-      <div>
-        Average Rent: ${toCAD(value)}
-        <br/>
+      <div class="width-150">
+        <h5>${toCAD(value)} </h5>
+        <span>${metricName.replace('_', ' ')}</span>
         <div class="text-muted">In ${neighborhood}</div>
       </div>`
     popup
@@ -95,12 +94,6 @@ export const hoverPolygon = e => (dispatch, getState) => {
   } else {
     dispatch({ type: types.CLEAR_INCOME })
   }
-
-  // if (polygon.ctuid !== ctuid) {
-  //   dispatch(fetchIncome(ctuid))
-  //   dispatch(fetchPlace(e.lngLat))
-  //   dispatch(fetchRent(ctname))
-  // }
 
   dispatch(updatePolgyonIds(ctuid, ctname))
 }

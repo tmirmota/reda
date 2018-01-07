@@ -2,37 +2,47 @@ import React from 'react'
 
 import { toCAD } from '../utils/formatUtils'
 
-const RegionSidebar = ({ property, polygon }) => {
+// Material UI
+import { FormControl } from 'material-ui/Form'
+import { InputLabel } from 'material-ui/Input'
+import { MenuItem } from 'material-ui/Menu'
+import Select from 'material-ui/Select'
+
+const styles = {
+  minWidth: '100%',
+  marginTop: '10px',
+}
+
+const RegionSidebar = ({ property, polygon, mapFeatures, changeHeatMap }) => {
   const { neighborhood, city } = property
-  const {
-    averageRent,
-    medianRent,
-    vacancyRate,
-    medianTotalHouseholdIncome,
-  } = polygon
-  const vacancyStr = vacancyRate.total ? vacancyRate.total / 100 + '%' : ''
+  const { medianTotalHouseholdIncome } = polygon
+  const { metricName, metricType } = mapFeatures
   return (
     <div>
-      <div className="lead">
+      <h3>
         {neighborhood}
         {neighborhood && city && ', '}
-      </div>
+      </h3>
       <div className="text-muted">{city}</div>
       <hr />
-      <div className="sidebar-heading text-uppercase">
-        <strong>Rental Data</strong>
-      </div>
+      <h4 className="sidebar-heading text-uppercase">Rental Data</h4>
       <div>
         <span>Average Rent</span>
-        <span className="float-right">{toCAD(averageRent.total)}</span>
+        <span className="float-right">
+          {toCAD(polygon['AVERAGE_RENT'][metricType])}
+        </span>
       </div>
       <div>
         <span>Median Rent</span>
-        <span className="float-right">{toCAD(medianRent.total)}</span>
+        <span className="float-right">
+          {toCAD(polygon['MEDIAN_RENT'][metricType])}
+        </span>
       </div>
       <div>
-        <span>Vancancy Rate</span>
-        <span className="float-right">{vacancyStr}</span>
+        <span>Vacancy Rate</span>
+        <span className="float-right">
+          {toCAD(polygon['VACANCY_RATE'][metricType])}
+        </span>
       </div>
       <div className="text-muted mt-2">
         Source:{' '}
@@ -54,6 +64,21 @@ const RegionSidebar = ({ property, polygon }) => {
           Stats Canada
         </a>
       </div>
+      <hr />
+      <FormControl style={styles}>
+        <Select value={metricType} name="metricType" onChange={changeHeatMap}>
+          <MenuItem value="BEDROOM_1">1 Bedroom</MenuItem>
+          <MenuItem value="BEDROOM_2">2 Bedrooms</MenuItem>
+          <MenuItem value="BEDROOM_3_PLUS">3+ Bedrooms</MenuItem>
+        </Select>
+      </FormControl>
+      <FormControl style={styles}>
+        <Select value={metricName} name="metricName" onChange={changeHeatMap}>
+          <MenuItem value="AVERAGE_RENT">Average Rent</MenuItem>
+          <MenuItem value="MEDIAN_RENT">Median Rent</MenuItem>
+          <MenuItem value="VACANCY_RATE">Vacancy Rate</MenuItem>
+        </Select>
+      </FormControl>
     </div>
   )
 }

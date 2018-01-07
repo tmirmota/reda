@@ -19,17 +19,16 @@ export const storeMapnPopup = (map, popup) => ({
   popup,
 })
 
-export const addHeatMap = json => (dispatch, getState) => {
-  const { mapFeatures } = getState()
-  const { map, metricType, metricName } = mapFeatures
+export const addHeatMap = (json, name, type) => (dispatch, getState) => {
+  const { map } = getState().mapFeatures
 
-  const metric = `${metricName}_${metricType}`
+  const metric = `${name}_${type}`
 
   const minValue = getMinValue(json, metric)
   const maxValue = getMaxValue(json, metric)
 
-  let fillStops = []
-  let hoverStops = []
+  let fillStops = [['0', 'rgba(0,0,0,0)']]
+  let hoverStops = [['0', 'rgba(0,0,0,0)']]
   let beginColor
   let endColor
 
@@ -49,6 +48,13 @@ export const addHeatMap = json => (dispatch, getState) => {
     }
   })
 
+  const paint = {
+    property: 'CTNAME',
+    type: 'categorical',
+    default: 'transparent',
+    stops: fillStops,
+  }
+
   dispatch({
     type: types.UPDATE_LEGEND,
     minValue,
@@ -56,7 +62,13 @@ export const addHeatMap = json => (dispatch, getState) => {
     beginColor,
     endColor,
   })
-  addHeatMapLayers(map, fillStops, hoverStops, 'CTNAME')
+  const hasLayer = map.getLayer('census-tracts-fill')
+  if (hasLayer) {
+    map.setPaintProperty('census-tracts-fill', 'fill-color', paint)
+    map.setPaintProperty('census-tracts-fill-hover', 'line-color', paint)
+  } else {
+    addHeatMapLayers(map, fillStops, hoverStops, 'CTNAME')
+  }
 }
 
 export const fetchIncomes = features => async (dispatch, getState) => {
@@ -72,8 +84,7 @@ export const fetchIncomes = features => async (dispatch, getState) => {
 }
 
 export const fetchDataLayers = () => async (dispatch, getState) => {
-  const { mapFeatures } = getState()
-  const { map } = mapFeatures
+  const { map, metricName, metricType } = getState().mapFeatures
 
   const features = map.queryRenderedFeatures({
     layers: ['census-tracts-2016geojson'],
@@ -86,12 +97,20 @@ export const fetchDataLayers = () => async (dispatch, getState) => {
   const url = `${RENT_URL.replace(':ctname', arrCtnames)}`
   const { json } = await apiFetch(url)
   if (json) {
-    dispatch(addHeatMap(json))
+    dispatch(addHeatMap(json, metricName, metricType))
     dispatch({ type: types.FETCH_RENTS, rents: json })
   }
 }
 
-export const changeHeatMap = event => dispatch => {
+export const changeHeatMap = event => (dispatch, getState) => {
   const { name, value } = event.target
+  const { mapFeatures } = getState()
+  const { map, rents } = mapFeatures
+
+  const metricName = name === 'metricName' ? value : mapFeatures['metricName']
+  const metricType = name === 'metricType' ? value : mapFeatures['metricType']
+
+  dispatch(addHeatMap(rents, metricName, metricType))
+
   dispatch({ type: types.UPDATE_HEATMAP_DATA, name, value })
 }

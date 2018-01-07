@@ -56,8 +56,10 @@ export const displayPopup = (location, layer) => (dispatch, getState) => {
 
     const popupText = `
       <div class="width-150">
-        <h5>${toCAD(value)} </h5>
-        <span>${metricName.replace('_', ' ')}</span>
+        <h5>${toCAD(value)}<span> / ${metricType
+      .replace('_', ' ')
+      .substring(8, 9)} bdr</span></h5>
+        <div>${metricName.replace('_', ' ')}</div>
         <div class="text-muted">In ${neighborhood}</div>
       </div>`
     popup

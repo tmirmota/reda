@@ -41,7 +41,7 @@ const RegionSidebar = ({ property, polygon, mapFeatures, changeHeatMap }) => {
       <div>
         <span>Vacancy Rate</span>
         <span className="float-right">
-          {toCAD(polygon['VACANCY_RATE'][metricType])}
+          {polygon['VACANCY_RATE'][metricType]}
         </span>
       </div>
       <div className="text-muted mt-2">
@@ -52,7 +52,7 @@ const RegionSidebar = ({ property, polygon, mapFeatures, changeHeatMap }) => {
       </div>
       <hr />
       <div className="sidebar-heading text-uppercase">
-        <strong>Rental Data</strong>
+        <strong>Stats Canada</strong>
       </div>
       <div>
         <span>Median Household Income</span>

@@ -14,7 +14,6 @@ export const toggleZoning = (event, checked) => (dispatch, getState) => {
       arrNames.push(Name)
     }
   })
-  console.log(arrNames.sort())
   let stops = []
   arrNames.map((name, index) => {
     const percent = index / arrNames.length
@@ -22,7 +21,6 @@ export const toggleZoning = (event, checked) => (dispatch, getState) => {
     const color = `rgba(${r},0,255,1)`
     stops.push([name, color])
   })
-  console.log(stops)
   if (checked) {
     map.addLayer(
       {

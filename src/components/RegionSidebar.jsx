@@ -4,7 +4,6 @@ import { toCAD } from '../utils/formatUtils'
 
 // Material UI
 import { FormControl } from 'material-ui/Form'
-import { InputLabel } from 'material-ui/Input'
 import { MenuItem } from 'material-ui/Menu'
 import Select from 'material-ui/Select'
 
@@ -13,9 +12,9 @@ const styles = {
   marginTop: '10px',
 }
 
-const RegionSidebar = ({ property, mapFeatures, changeHeatMap }) => {
+const RegionSidebar = ({ rent, property, mapFeatures, changeHeatMap }) => {
   const { neighborhood, city } = property
-  const { metricName, metricType } = mapFeatures
+  const { metricType } = mapFeatures
   return (
     <div>
       <h3>
@@ -23,11 +22,20 @@ const RegionSidebar = ({ property, mapFeatures, changeHeatMap }) => {
         {neighborhood && city && ', '}
       </h3>
       <hr />
+      <div>
+        <span>Average Rent</span>
+        <span className="float-right">{toCAD(rent.price)}</span>
+      </div>
+      <div>
+        <span>Count</span>
+        <span className="float-right">{rent.count}</span>
+      </div>
+      <hr />
       <FormControl style={styles}>
         <Select value={metricType} name="metricType" onChange={changeHeatMap}>
           <MenuItem value="BEDROOM_1">1 Bedroom</MenuItem>
           <MenuItem value="BEDROOM_2">2 Bedrooms</MenuItem>
-          <MenuItem value="BEDROOM_3_PLUS">3+ Bedrooms</MenuItem>
+          <MenuItem value="BEDROOM_3">3+ Bedrooms</MenuItem>
         </Select>
       </FormControl>
     </div>

@@ -1,12 +1,9 @@
 import * as types from '../constants/ActionTypes'
-import { INCOME_URL, RENT_URL } from '../constants/ApiConstants'
-import { apiFetch } from '../utils/apiUtils'
-import { getRents } from '../utils/placeUtils'
 import { toCAD } from '../utils/formatUtils'
 import { queryNeighborhood } from '../actions/PropertyActions'
 
 export const displayPopup = (location, value) => (dispatch, getState) => {
-  const { property, mapFeatures, rent } = getState()
+  const { property, mapFeatures } = getState()
   const { map, popup, metricName, metricType } = mapFeatures
 
   const features = map.queryRenderedFeatures(location.point, {
@@ -21,7 +18,7 @@ export const displayPopup = (location, value) => (dispatch, getState) => {
         <h5>${toCAD(value)}<span> / ${metricType
       .replace('_', ' ')
       .substring(8, 9)} bdr</span></h5>
-        <div>${metricName.replace('_', ' ')}</div>
+        <div>${metricName.replace('_', ' ')} RENT</div>
         <div class="text-muted">In ${property.neighborhood}</div>
       </div>`
     popup
@@ -50,16 +47,16 @@ export const hoverPolygon = e => (dispatch, getState) => {
 
   const rentRef = rents.find(row => row[identifier] === id)
 
-  const rent = {
-    price: rentRef[priceMetric].toFixed(),
-    count: rentRef[countMetric],
-  }
-
-  if (rent.price > 0) {
+  if (rentRef) {
+    const rent = {
+      price: rentRef[priceMetric].toFixed(),
+      count: rentRef[countMetric],
+    }
     dispatch(displayPopup(e, rent.price))
     dispatch(queryNeighborhood(e))
     dispatch({ type: types.UPDATE_RENT, rent })
   } else {
+    console.log(rentRef)
     dispatch({ type: types.RESET_RENT })
   }
 }

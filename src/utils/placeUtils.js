@@ -34,6 +34,7 @@ export const getRent = (rentals, feature) => {
         totalpricebed3 += price
         countbed3++
       }
+      return true
     })
   }
   const ctname = feature.properties['CTNAME']

@@ -1,5 +1,4 @@
 import * as types from '../constants/ActionTypes'
-import { zoneLine } from '../constants/MapConstants'
 
 export const toggleZoning = (event, checked) => (dispatch, getState) => {
   const { mapFeatures } = getState()
@@ -13,13 +12,14 @@ export const toggleZoning = (event, checked) => (dispatch, getState) => {
     if (arrNames.indexOf(Name) === -1) {
       arrNames.push(Name)
     }
+    return true
   })
   let stops = []
   arrNames.map((name, index) => {
     const percent = index / arrNames.length
     const r = (percent * 255).toFixed()
     const color = `rgba(${r},0,255,1)`
-    stops.push([name, color])
+    return stops.push([name, color])
   })
   if (checked) {
     map.addLayer(

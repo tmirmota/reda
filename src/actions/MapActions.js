@@ -1,8 +1,6 @@
 import * as types from '../constants/ActionTypes'
 import { polygon, pointsWithinPolygon } from '@turf/turf'
 
-import { RENT_URL, INCOME_URL } from '../constants/ApiConstants'
-import { apiFetch } from '../utils/apiUtils'
 import { getMinValue, getMaxValue } from '../utils/commonUtils'
 import { addHeatMapLayers } from '../utils/mapUtils'
 import { getRent } from '../utils/placeUtils'
@@ -22,22 +20,25 @@ export const storeMapnPopup = (map, popup) => ({
   popup,
 })
 
-export const addHeatMap = rents => (dispatch, getState) => {
+export const addHeatMap = (
+  rents,
+  metricName = 'AVERAGE',
+  metricType = 'BEDROOM_1',
+) => (dispatch, getState) => {
   const { map } = getState().mapFeatures
 
-  console.log(rents)
-  // const metric = `${name}_${type}`
+  const metric = `${metricName}_${metricType}`
 
   let fillStops = [['0', 'rgba(0,0,0,0)']]
   let hoverStops = [['0', 'rgba(0,0,0,0)']]
   let beginColor
   let endColor
 
-  const minValue = getMinValue(rents, 'AVERAGE_BEDROOM_1')
-  const maxValue = getMaxValue(rents, 'AVERAGE_BEDROOM_1')
+  const minValue = getMinValue(rents, metric)
+  const maxValue = getMaxValue(rents, metric)
 
   rents.map(polygon => {
-    const value = polygon['AVERAGE_BEDROOM_1']
+    const value = polygon[metric]
     const ctname = polygon['CTNAME']
 
     if (value > 0) {
@@ -55,9 +56,8 @@ export const addHeatMap = rents => (dispatch, getState) => {
         hoverStops.push([ctname, hover])
       }
     }
+    return true
   })
-
-  console.log(fillStops)
 
   const paint = {
     property: 'CTNAME',
@@ -83,7 +83,7 @@ export const addHeatMap = rents => (dispatch, getState) => {
 }
 
 export const fetchDataLayers = () => async (dispatch, getState) => {
-  const { map, metricName, metricType } = getState().mapFeatures
+  const { map } = getState().mapFeatures
 
   const craigslistFeatures = map.queryRenderedFeatures({
     layers: ['craigslist-van-rentals-data-2-d5abc4'],
@@ -96,7 +96,6 @@ export const fetchDataLayers = () => async (dispatch, getState) => {
   let rents = []
 
   polygonFeatures.map(feature => {
-    let average
     const { coordinates } = feature.geometry
     if (coordinates[0].length >= 4) {
       const rentalPoints = {
@@ -111,6 +110,7 @@ export const fetchDataLayers = () => async (dispatch, getState) => {
       const rent = getRent(rentals, feature)
       rents.push(rent)
     }
+    return true
   })
 
   dispatch(addHeatMap(rents))
@@ -120,12 +120,11 @@ export const fetchDataLayers = () => async (dispatch, getState) => {
 export const changeHeatMap = event => (dispatch, getState) => {
   const { name, value } = event.target
   const { mapFeatures } = getState()
-  const { map, rents } = mapFeatures
+  const { rents } = mapFeatures
 
   const metricName = name === 'metricName' ? value : mapFeatures['metricName']
   const metricType = name === 'metricType' ? value : mapFeatures['metricType']
 
   dispatch(addHeatMap(rents, metricName, metricType))
-
   dispatch({ type: types.UPDATE_HEATMAP_DATA, name, value })
 }

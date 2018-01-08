@@ -14,13 +14,13 @@ const SidebarComponent = props => <Sidebar {...props} />
 const mapStateToProps = ({
   property,
   selectedProperty,
-  polygon,
+  rent,
   filters,
   mapFeatures,
 }) => ({
   property,
   selectedProperty,
-  polygon,
+  rent,
   filters,
   mapFeatures,
 })

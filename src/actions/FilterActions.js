@@ -4,8 +4,9 @@ export const toggleZoning = (event, checked) => (dispatch, getState) => {
   const { mapFeatures } = getState()
   const { map } = mapFeatures
   const features = map.querySourceFeatures('zoning', {
-    sourceLayer: ['zoning_districtsgeojson'],
+    sourceLayer: ['zoning_districtsgeojson']
   })
+
   let arrNames = []
   features.map(({ properties }) => {
     const { Name } = properties
@@ -35,12 +36,12 @@ export const toggleZoning = (event, checked) => (dispatch, getState) => {
             property: 'Name',
             type: 'categorical',
             default: 'transparent',
-            stops: stops,
+            stops: stops
           },
-          'line-width': 2,
-        },
+          'line-width': 2
+        }
       },
-      'water',
+      'water'
     )
   } else {
     map.removeLayer('zoning-line')
@@ -61,8 +62,8 @@ export const toggleTransit = (event, checked) => (dispatch, getState) => {
       type: 'line',
       paint: {
         'line-color': '#128ef4',
-        'line-width': 2,
-      },
+        'line-width': 2
+      }
     })
     map.addLayer({
       id: 'transit-stations',
@@ -74,10 +75,10 @@ export const toggleTransit = (event, checked) => (dispatch, getState) => {
       paint: {
         'circle-radius': {
           base: 1.4,
-          stops: [[12, 2], [22, 180]],
+          stops: [[12, 2], [22, 180]]
         },
-        'circle-color': 'rgb(214, 21, 21)',
-      },
+        'circle-color': 'rgb(214, 21, 21)'
+      }
     })
     map.on('mousemove', 'transit-stations', e => {
       map.getCanvas().style.cursor = 'pointer'
@@ -115,10 +116,10 @@ export const toggleFire = (event, checked) => (dispatch, getState) => {
       paint: {
         'circle-radius': {
           base: 2,
-          stops: [[12, 2], [22, 180]],
+          stops: [[12, 2], [22, 180]]
         },
-        'circle-color': 'rgb(214, 21, 21)',
-      },
+        'circle-color': 'rgb(214, 21, 21)'
+      }
     })
   } else {
     map.removeLayer('fire-hydrants')
@@ -140,10 +141,10 @@ export const toggleSchools = (event, checked) => (dispatch, getState) => {
       paint: {
         'circle-radius': {
           base: 2,
-          stops: [[12, 10], [22, 1.5]],
+          stops: [[12, 10], [22, 1.5]]
         },
-        'circle-color': '#f412da',
-      },
+        'circle-color': '#f412da'
+      }
     })
 
     map.on('mousemove', 'school-points', e => {

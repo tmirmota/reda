@@ -12,9 +12,9 @@ const styles = {
   marginTop: '10px',
 }
 
-const RegionSidebar = ({ rent, property, mapFeatures, changeHeatMap }) => {
+const RegionSidebar = ({ rent, property, mapFeatures, changeMetric }) => {
   const { neighborhood, city } = property
-  const { metricType } = mapFeatures
+  const { bedrooms } = mapFeatures
   return (
     <div>
       <h3>
@@ -27,15 +27,19 @@ const RegionSidebar = ({ rent, property, mapFeatures, changeHeatMap }) => {
         <span className="float-right">{toCAD(rent.price)}</span>
       </div>
       <div>
+        <span>Average SQFT</span>
+        <span className="float-right">{rent.sqft}</span>
+      </div>
+      <div>
         <span>Count</span>
         <span className="float-right">{rent.count}</span>
       </div>
       <hr />
       <FormControl style={styles}>
-        <Select value={metricType} name="metricType" onChange={changeHeatMap}>
-          <MenuItem value="BEDROOM_1">1 Bedroom</MenuItem>
-          <MenuItem value="BEDROOM_2">2 Bedrooms</MenuItem>
-          <MenuItem value="BEDROOM_3">3+ Bedrooms</MenuItem>
+        <Select value={bedrooms} name="bedrooms" onChange={changeMetric}>
+          <MenuItem value={1}>1 Bedroom</MenuItem>
+          <MenuItem value={2}>2 Bedrooms</MenuItem>
+          <MenuItem value={3}>3+ Bedrooms</MenuItem>
         </Select>
       </FormControl>
     </div>

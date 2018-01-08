@@ -6,7 +6,7 @@ import { addHeatMapLayers } from '../utils/mapUtils'
 import { getRent } from '../utils/placeUtils'
 
 export const clearState = () => ({
-  type: types.RESET_STATE,
+  type: types.RESET_STATE
 })
 
 export const updateCoordinates = map => dispatch => {
@@ -17,13 +17,13 @@ export const updateCoordinates = map => dispatch => {
 export const storeMapnPopup = (map, popup) => ({
   type: types.SET_MAP,
   map,
-  popup,
+  popup
 })
 
 export const addHeatMap = (
   rents,
   metricName = 'AVERAGE',
-  metricType = 'BEDROOM_1',
+  metricType = 'BEDROOM_1'
 ) => (dispatch, getState) => {
   const { map } = getState().mapFeatures
 
@@ -63,7 +63,7 @@ export const addHeatMap = (
     property: 'CTNAME',
     type: 'categorical',
     default: 'transparent',
-    stops: fillStops,
+    stops: fillStops
   }
 
   dispatch({
@@ -71,7 +71,7 @@ export const addHeatMap = (
     minValue,
     maxValue,
     beginColor,
-    endColor,
+    endColor
   })
   const hasLayer = map.getLayer('census-tracts-fill')
   if (hasLayer) {
@@ -82,49 +82,72 @@ export const addHeatMap = (
   }
 }
 
-export const fetchDataLayers = () => async (dispatch, getState) => {
-  const { map } = getState().mapFeatures
-
+export const fetchDataLayers = map => dispatch => {
   const craigslistFeatures = map.queryRenderedFeatures({
-    layers: ['craigslist-van-rentals-data-2-d5abc4'],
+    layers: ['craigslist-van-rentals-data-2-d5abc4']
   })
 
   const polygonFeatures = map.queryRenderedFeatures({
-    layers: ['census-tracts-2016geojson'],
+    layers: ['census-tracts-2016geojson']
   })
 
   let rents = []
+
+  let newFeatures = []
 
   polygonFeatures.map(feature => {
     const { coordinates } = feature.geometry
     if (coordinates[0].length >= 4) {
       const rentalPoints = {
         type: 'FeatureCollection',
-        features: craigslistFeatures,
+        features: craigslistFeatures
       }
-      const searchWithin = polygon([coordinates[0]])
-      const ptsWithin = pointsWithinPolygon(rentalPoints, searchWithin)
+      let searchWithin = polygon([coordinates[0]])
 
+      const ptsWithin = pointsWithinPolygon(rentalPoints, searchWithin)
       const rentals = ptsWithin.features
 
       const rent = getRent(rentals, feature)
+
+      searchWithin.properties = rent
+      newFeatures.push(searchWithin)
       rents.push(rent)
     }
     return true
   })
 
-  dispatch(addHeatMap(rents))
-  dispatch({ type: types.UPDATE_RENTS, rents })
+  // console.log(JSON.stringify(newFeatures))
+
+  // dispatch(addHeatMap(rents))
+  // dispatch({ type: types.UPDATE_RENTS, rents })
 }
 
-export const changeHeatMap = event => (dispatch, getState) => {
+export const calcMinMax = map => (dispatch, getState) => {
+  const { bedrooms } = getState().mapFeatures
+  const features = map.queryRenderedFeatures({
+    layers: ['van-rents-by-ct-jan-08geojson']
+  })
+  const metric = `bedroom_${bedrooms}_average_price`
+
+  const minValue = features.reduce((min, feature) => {
+    const price = feature.properties[metric]
+    return price !== 0 && price < min ? price : min
+  }, features[0].properties[metric])
+
+  const maxValue = features.reduce((max, feature) => {
+    const price = feature.properties[metric]
+    return price > max ? price : max
+}, features[0].properties[metric])
+
+  dispatch({ type: types.UPDATE_MINMAX, minValue, maxValue })
+
+}
+
+export const changeMetric = event => (dispatch, getState) => {
   const { name, value } = event.target
   const { mapFeatures } = getState()
   const { rents } = mapFeatures
 
-  const metricName = name === 'metricName' ? value : mapFeatures['metricName']
-  const metricType = name === 'metricType' ? value : mapFeatures['metricType']
-
-  dispatch(addHeatMap(rents, metricName, metricType))
-  dispatch({ type: types.UPDATE_HEATMAP_DATA, name, value })
+  // dispatch(addHeatMap(rents, metricName, metricType))
+  dispatch({ type: types.UPDATE_METRIC, name, value })
 }

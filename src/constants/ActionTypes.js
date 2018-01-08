@@ -6,12 +6,13 @@ export const TOGGLE_FILTER = 'TOGGLE_FILTER'
 
 // Legend
 export const UPDATE_LEGEND = 'UPDATE_LEGEND'
+export const UPDATE_MINMAX = 'UPDATE_MINMAX'
 
 // MapFeatures
 export const SET_MAP = 'SET_MAP'
 export const UPDATE_COORDINATES = 'UPDATE_COORDINATES'
 export const UPDATE_RENTS = 'UPDATE_RENTS'
-export const UPDATE_HEATMAP_DATA = 'UPDATE_HEATMAP_DATA'
+export const UPDATE_METRIC = 'UPDATE_HEATMAP_DATA'
 
 // Property
 export const UPDATE_ADDRESS = 'UPDATE_ADDRESS'

@@ -3,6 +3,7 @@ import * as types from '../constants/ActionTypes'
 const initialState = {
   price: null,
   count: null,
+  sqft: null
 }
 
 const rent = (state = initialState, action) => {
@@ -11,6 +12,7 @@ const rent = (state = initialState, action) => {
       return {
         price: action.rent.price,
         count: action.rent.count,
+        sqft: action.rent.sqft
       }
 
     case types.RESET_RENT:

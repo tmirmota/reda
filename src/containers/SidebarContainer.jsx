@@ -7,7 +7,7 @@ import {
   toggleFire,
   toggleSchools,
 } from '../actions/FilterActions'
-import { changeHeatMap } from '../actions/MapActions'
+import { changeMetric } from '../actions/MapActions'
 
 const SidebarComponent = props => <Sidebar {...props} />
 
@@ -30,5 +30,5 @@ export default connect(mapStateToProps, {
   toggleTransit,
   toggleFire,
   toggleSchools,
-  changeHeatMap,
+  changeMetric,
 })(SidebarComponent)

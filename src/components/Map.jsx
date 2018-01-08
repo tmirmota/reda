@@ -23,6 +23,7 @@ class Map extends Component {
       hoverProperty,
       hoverPolygon,
       fetchDataLayers,
+      calcMinMax,
       clearState,
     } = this.props
 
@@ -58,14 +59,30 @@ class Map extends Component {
       storeMapnPopup(map, popup)
       addSources(map)
       addLayers(map)
-      fetchDataLayers()
+      // fetchDataLayers(map)
+      calcMinMax(map)
+      
+      map.addLayer({
+        id: 'census-tracts-fill-hover',
+        source: 'census-tracts',
+        'source-layer': 'census_tracts_2016geojson',
+        minzoom: 9,
+        maxzoom: 14,
+        type: 'line',
+        paint: {
+          'line-color': '#4fc3f7',
+          'line-width': 3
+        },
+        filter: ['==', 'CTUID', '']
+      }, 'water')
 
-      map.on('mousemove', 'census-tracts-fill', e => {
+
+      map.on('mousemove', 'van-rents-by-ct-jan-08geojson', e => {
         const filterName = e.features[0].properties['CTUID']
         map.setFilter('census-tracts-fill-hover', ['==', 'CTUID', filterName])
         hoverPolygon(e)
       })
-      map.on('mouseleave', 'census-tracts-fill', () => {
+      map.on('mouseleave', 'van-rents-by-ct-jan-08geojson', () => {
         map.setFilter('census-tracts-fill-hover', ['==', 'CTUID', ''])
         clearState()
       })

@@ -2,17 +2,14 @@ import * as types from '../constants/ActionTypes'
 
 const initialState = {
   style: 'styles/tmirmota/cjc2s1iic1pzm2sqvnkyjt06q',
-  lat: 49.2532,
-  lng: -123.1113,
-  zoom: 12,
+  lat: 49.261069,
+  lng: -123.1427207,
+  zoom: 10,
   maxBounds: [
     [-123.29430051866589, 49.15593259948497],
     [-122.89152688587282, 49.34756088632997],
   ],
-  rents: [],
-  metricType: 'BEDROOM_1',
-  metricName: 'AVERAGE',
-  identifier: 'CTNAME',
+  bedrooms: 1
 }
 
 const map = (state = initialState, action) => {
@@ -33,13 +30,7 @@ const map = (state = initialState, action) => {
         zoom,
       }
 
-    case types.UPDATE_RENTS:
-      return {
-        ...state,
-        rents: action.rents,
-      }
-
-    case types.UPDATE_HEATMAP_DATA:
+    case types.UPDATE_METRIC:
       return {
         ...state,
         [action.name]: action.value,

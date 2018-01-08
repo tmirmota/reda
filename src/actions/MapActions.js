@@ -1,4 +1,5 @@
 import * as types from '../constants/ActionTypes'
+import { points, polygon, pointsWithinPolygon } from '@turf/turf'
 import { RENT_URL, INCOME_URL } from '../constants/ApiConstants'
 import { apiFetch } from '../utils/apiUtils'
 import { getMinValue, getMaxValue } from '../utils/commonUtils'
@@ -21,19 +22,61 @@ export const storeMapnPopup = (map, popup) => ({
 
 export const addHeatMap = (json, name, type) => (dispatch, getState) => {
   const { map } = getState().mapFeatures
-
   const metric = `${name}_${type}`
 
-  const minValue = getMinValue(json, metric)
-  const maxValue = getMaxValue(json, metric)
+  const craigslistFeatures = map.queryRenderedFeatures({
+    layers: ['craigslist-van-rentals-data-2-d5abc4'],
+  })
 
+  const polygonFeatures = map.queryRenderedFeatures({
+    layers: ['census-tracts-2016geojson'],
+  })
+
+  let total = 0
+  let average = 0
   let fillStops = [['0', 'rgba(0,0,0,0)']]
   let hoverStops = [['0', 'rgba(0,0,0,0)']]
   let beginColor
   let endColor
 
-  json.forEach(row => {
-    const value = row[metric]
+  let objects = []
+
+  polygonFeatures.map(feature => {
+    const rentalPoints = {
+      type: 'FeatureCollection',
+      features: craigslistFeatures,
+    }
+
+    const { coordinates } = feature.geometry
+    if (coordinates[0].length >= 4) {
+      const searchWithin = polygon([coordinates[0]])
+      const ptsWithin = pointsWithinPolygon(rentalPoints, searchWithin)
+      const rentals = ptsWithin.features
+      if (rentals.length > 0) {
+        total = rentals.reduce(
+          (total, rental) => total + rental.properties['PRICE'],
+          0,
+        )
+        average = total / rentals.length
+      }
+    }
+    const ctname = feature.properties['CTNAME']
+
+    const object = {
+      CTNAME: ctname,
+      AVERAGE: average,
+    }
+
+    objects.push(object)
+  })
+
+  const minValue = getMinValue(objects, 'AVERAGE')
+  const maxValue = getMaxValue(objects, 'AVERAGE')
+
+  objects.map(polygon => {
+    const value = polygon['AVERAGE']
+    const ctname = polygon['CTNAME']
+
     if (value > 0) {
       const percent = (value - minValue) / (maxValue - minValue)
       const percentRed = ((percent * 255 - 255) * -1).toFixed()
@@ -43,10 +86,15 @@ export const addHeatMap = (json, name, type) => (dispatch, getState) => {
       if (value === minValue) return (beginColor = fill)
       if (value === maxValue) return (endColor = fill)
 
-      fillStops.push([row['CTUID'], fill])
-      hoverStops.push([row['CTUID'], hover])
+      const hasName = fillStops.filter(stop => stop[0] === ctname)
+      if (hasName.length <= 0) {
+        fillStops.push([ctname, fill])
+        hoverStops.push([ctname, hover])
+      }
     }
   })
+
+  console.log(fillStops)
 
   const paint = {
     property: 'CTNAME',

@@ -4,27 +4,15 @@ const initialState = {
   ctuid: null,
   ctname: null,
   altGeoCode: null,
-  medianTotalHouseholdIncome: null,
   AVERAGE_RENT: {
-    BACHELOR: null,
     BEDROOM_1: null,
     BEDROOM_2: null,
     BEDROOM_3_PLUS: null,
-    TOTAL: null,
   },
   MEDIAN_RENT: {
-    BACHELOR: null,
     BEDROOM_1: null,
     BEDROOM_2: null,
     BEDROOM_3_PLUS: null,
-    TOTAL: null,
-  },
-  VACANCY_RATE: {
-    BACHELOR: null,
-    BEDROOM_1: null,
-    BEDROOM_2: null,
-    BEDROOM_3_PLUS: null,
-    TOTAL: null,
   },
 }
 

@@ -1,12 +1,14 @@
 import * as types from '../constants/ActionTypes'
-import { points, polygon, pointsWithinPolygon } from '@turf/turf'
+import { polygon, pointsWithinPolygon } from '@turf/turf'
+
 import { RENT_URL, INCOME_URL } from '../constants/ApiConstants'
 import { apiFetch } from '../utils/apiUtils'
 import { getMinValue, getMaxValue } from '../utils/commonUtils'
 import { addHeatMapLayers } from '../utils/mapUtils'
+import { getRent } from '../utils/placeUtils'
 
 export const clearState = () => ({
-  type: types.CLEAR_STATE,
+  type: types.RESET_STATE,
 })
 
 export const updateCoordinates = map => dispatch => {
@@ -20,61 +22,22 @@ export const storeMapnPopup = (map, popup) => ({
   popup,
 })
 
-export const addHeatMap = (json, name, type) => (dispatch, getState) => {
+export const addHeatMap = rents => (dispatch, getState) => {
   const { map } = getState().mapFeatures
-  const metric = `${name}_${type}`
 
-  const craigslistFeatures = map.queryRenderedFeatures({
-    layers: ['craigslist-van-rentals-data-2-d5abc4'],
-  })
+  console.log(rents)
+  // const metric = `${name}_${type}`
 
-  const polygonFeatures = map.queryRenderedFeatures({
-    layers: ['census-tracts-2016geojson'],
-  })
-
-  let total = 0
-  let average = 0
   let fillStops = [['0', 'rgba(0,0,0,0)']]
   let hoverStops = [['0', 'rgba(0,0,0,0)']]
   let beginColor
   let endColor
 
-  let objects = []
+  const minValue = getMinValue(rents, 'AVERAGE_BEDROOM_1')
+  const maxValue = getMaxValue(rents, 'AVERAGE_BEDROOM_1')
 
-  polygonFeatures.map(feature => {
-    const rentalPoints = {
-      type: 'FeatureCollection',
-      features: craigslistFeatures,
-    }
-
-    const { coordinates } = feature.geometry
-    if (coordinates[0].length >= 4) {
-      const searchWithin = polygon([coordinates[0]])
-      const ptsWithin = pointsWithinPolygon(rentalPoints, searchWithin)
-      const rentals = ptsWithin.features
-      if (rentals.length > 0) {
-        total = rentals.reduce(
-          (total, rental) => total + rental.properties['PRICE'],
-          0,
-        )
-        average = total / rentals.length
-      }
-    }
-    const ctname = feature.properties['CTNAME']
-
-    const object = {
-      CTNAME: ctname,
-      AVERAGE: average,
-    }
-
-    objects.push(object)
-  })
-
-  const minValue = getMinValue(objects, 'AVERAGE')
-  const maxValue = getMaxValue(objects, 'AVERAGE')
-
-  objects.map(polygon => {
-    const value = polygon['AVERAGE']
+  rents.map(polygon => {
+    const value = polygon['AVERAGE_BEDROOM_1']
     const ctname = polygon['CTNAME']
 
     if (value > 0) {
@@ -119,35 +82,39 @@ export const addHeatMap = (json, name, type) => (dispatch, getState) => {
   }
 }
 
-export const fetchIncomes = features => async (dispatch, getState) => {
-  let arrCtuid = []
-  features.map(({ properties }) => {
-    return arrCtuid.push(properties['CTUID'])
-  })
-  const url = `${INCOME_URL.replace(':ctuid', arrCtuid)}`
-  const { json } = await apiFetch(url)
-  if (json) {
-    dispatch({ type: types.FETCH_INCOMES, incomes: json })
-  }
-}
-
 export const fetchDataLayers = () => async (dispatch, getState) => {
   const { map, metricName, metricType } = getState().mapFeatures
 
-  const features = map.queryRenderedFeatures({
+  const craigslistFeatures = map.queryRenderedFeatures({
+    layers: ['craigslist-van-rentals-data-2-d5abc4'],
+  })
+
+  const polygonFeatures = map.queryRenderedFeatures({
     layers: ['census-tracts-2016geojson'],
   })
-  dispatch(fetchIncomes(features))
-  let arrCtnames = []
-  features.map(({ properties }) => {
-    return arrCtnames.push(properties['CTNAME'])
+
+  let rents = []
+
+  polygonFeatures.map(feature => {
+    let average
+    const { coordinates } = feature.geometry
+    if (coordinates[0].length >= 4) {
+      const rentalPoints = {
+        type: 'FeatureCollection',
+        features: craigslistFeatures,
+      }
+      const searchWithin = polygon([coordinates[0]])
+      const ptsWithin = pointsWithinPolygon(rentalPoints, searchWithin)
+
+      const rentals = ptsWithin.features
+
+      const rent = getRent(rentals, feature)
+      rents.push(rent)
+    }
   })
-  const url = `${RENT_URL.replace(':ctname', arrCtnames)}`
-  const { json } = await apiFetch(url)
-  if (json) {
-    dispatch(addHeatMap(json, metricName, metricType))
-    dispatch({ type: types.FETCH_RENTS, rents: json })
-  }
+
+  dispatch(addHeatMap(rents))
+  dispatch({ type: types.UPDATE_RENTS, rents })
 }
 
 export const changeHeatMap = event => (dispatch, getState) => {

@@ -60,9 +60,6 @@ class Map extends Component {
       addLayers(map)
       fetchDataLayers()
 
-      map.setLayerZoomRange('road-label-large', 13.5, 22)
-      map.setLayerZoomRange('road-label-medium', 15, 22)
-
       map.on('mousemove', 'census-tracts-fill', e => {
         const filterName = e.features[0].properties['CTUID']
         map.setFilter('census-tracts-fill-hover', ['==', 'CTUID', filterName])

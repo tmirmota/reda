@@ -13,7 +13,9 @@ const Legend = ({ mapFeatures, legend }) => {
   }
   return (
     <div className="width-small bottom-right shadow mr-3 mb-4 p-3 bg-white rounded">
-      <div className="text-muted">{metricName.replace('_', ' ')} RANGE</div>
+      <div className="text-muted">
+        {metricName.replace('_', ' ')} RENT RANGE
+      </div>
       <div style={styles} className="height-small rounded" />
       <div>
         {toCAD(minValue)}

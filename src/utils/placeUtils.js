@@ -12,27 +12,39 @@ export const neighborhoodName = features => {
   }
 }
 
-export const getRents = data => {
-  const averageRent = {
-    BACHELOR: data['AVERAGE_RENT_BACHELOR'],
-    BEDROOM_1: data['AVERAGE_RENT_BEDROOM_1'],
-    BEDROOM_2: data['AVERAGE_RENT_BEDROOM_2'],
-    BEDROOM_3_PLUS: data['AVERAGE_RENT_BEDROOM_3_PLUS'],
-    total: data['AVERAGE_RENT_TOTAL'],
+export const getRent = (rentals, feature) => {
+  let totalpricebed1 = 0
+  let totalpricebed2 = 0
+  let totalpricebed3 = 0
+
+  let countbed1 = 0
+  let countbed2 = 0
+  let countbed3 = 0
+  if (rentals.length > 0) {
+    rentals.map(rental => {
+      const bedrooms = rental.properties['BEDROOMS']
+      const price = rental.properties['PRICE']
+      if (bedrooms === 1) {
+        totalpricebed1 += price
+        countbed1++
+      } else if (bedrooms === 2) {
+        totalpricebed2 += price
+        countbed2++
+      } else if (bedrooms >= 3) {
+        totalpricebed3 += price
+        countbed3++
+      }
+    })
   }
-  const medianRent = {
-    BACHELOR: data['MEDIAN_RENT_BACHELOR'],
-    BEDROOM_1: data['MEDIAN_RENT_BEDROOM_1'],
-    BEDROOM_2: data['MEDIAN_RENT_BEDROOM_2'],
-    BEDROOM_3_PLUS: data['MEDIAN_RENT_BEDROOM_3_PLUS'],
-    total: data['MEDIAN_RENT_TOTAL'],
+  const ctname = feature.properties['CTNAME']
+
+  return {
+    CTNAME: ctname,
+    AVERAGE_BEDROOM_1: totalpricebed1 > 0 ? totalpricebed1 / countbed1 : 0,
+    AVERAGE_BEDROOM_2: totalpricebed2 > 0 ? totalpricebed2 / countbed2 : 0,
+    AVERAGE_BEDROOM_3: totalpricebed3 > 0 ? totalpricebed3 / countbed3 : 0,
+    AVERAGE_BEDROOM_1_COUNT: countbed1,
+    AVERAGE_BEDROOM_2_COUNT: countbed2,
+    AVERAGE_BEDROOM_3_COUNT: countbed3,
   }
-  const vacancyRate = {
-    BACHELOR: data['VACANCY_RATE_BACHELOR'],
-    BEDROOM_1: data['VACANCY_RATE_BEDROOM_1'],
-    BEDROOM_2: data['VACANCY_RATE_BEDROOM_2'],
-    BEDROOM_3_PLUS: data['VACANCY_RATE_BEDROOM_3_PLUS'],
-    total: data['VACANCY_RATE_TOTAL'],
-  }
-  return { averageRent, medianRent, vacancyRate }
 }

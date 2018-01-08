@@ -8,14 +8,6 @@ const initialState = {
   fireHydrants: false,
 }
 
-const second = {
-  zoning: true,
-  satellite: false,
-  transit: false,
-  schools: false,
-  fireHydrants: false,
-}
-
 const filters = (state = initialState, action) => {
   switch (action.type) {
     case types.TOGGLE_FILTER:

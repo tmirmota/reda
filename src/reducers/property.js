@@ -62,7 +62,7 @@ const property = (state = initialState, action) => {
         neighborhood: action.neighborhood,
       }
 
-    case types.CLEAR_STATE:
+    case types.RESET_STATE:
       return initialState
 
     default:

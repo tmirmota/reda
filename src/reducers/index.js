@@ -3,7 +3,7 @@ import { combineReducers } from 'redux'
 // Reducers
 import mapFeatures from './mapFeatures'
 import filters from './filters'
-import polygon from './polygon'
+import rent from './rent'
 import property from './property'
 import selectedProperty from './selectedProperty'
 import legend from './legend'
@@ -11,7 +11,7 @@ import legend from './legend'
 const rootReducer = combineReducers({
   mapFeatures,
   filters,
-  polygon,
+  rent,
   property,
   selectedProperty,
   legend,

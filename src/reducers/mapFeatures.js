@@ -10,9 +10,9 @@ const initialState = {
     [-122.89152688587282, 49.34756088632997],
   ],
   rents: [],
-  incomes: [],
-  metricType: 'BEDROOM_2',
-  metricName: 'AVERAGE_RENT',
+  metricType: 'BEDROOM_1',
+  metricName: 'AVERAGE',
+  identifier: 'CTNAME',
 }
 
 const map = (state = initialState, action) => {
@@ -33,16 +33,10 @@ const map = (state = initialState, action) => {
         zoom,
       }
 
-    case types.FETCH_RENTS:
+    case types.UPDATE_RENTS:
       return {
         ...state,
         rents: action.rents,
-      }
-
-    case types.FETCH_INCOMES:
-      return {
-        ...state,
-        incomes: action.incomes,
       }
 
     case types.UPDATE_HEATMAP_DATA:

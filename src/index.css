@@ -1,5 +1,5 @@
 @import url('https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css');
-/* @import url('https://fonts.googleapis.com/css?family=Roboto'); */
+/* @import url('https://fonts.googleapis.com/css?family=Roboto?100,300'); */
 
 html,
 body {
@@ -8,8 +8,18 @@ body {
 body {
   margin: 0;
   padding: 0;
+  color: #1b2733;
   font-family: 'Helvetica', sans-serif;
-  font-size: 14px;
+  font-size: 16px;
+}
+
+h4 {
+  font-family: Futura, "Trebuchet MS", Arial, sans-serif !important;
+}
+
+h3 {
+  font-family: Futura, "Trebuchet MS", Arial, sans-serif !important;
+  color: rgba(0,0,0,0.24);
 }
 
 #root {

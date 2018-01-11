@@ -6,18 +6,23 @@ import RegionSidebar from './RegionSidebar'
 import Filters from './Filters'
 
 const Sidebar = props => {
-  return (
-    <div className="col pt-4 sidebar">
-      <div className="d-flex flex-column h-100">
-        {props.mapFeatures.zoom > 14 ? (
+  if (props.mapFeatures.zoom > 14) {
+    return (
+      <div className="col pt-4 sidebar">
+        <div className="d-flex flex-column h-100">
           <PropertySidebar {...props} />
-        ) : (
-          <RegionSidebar {...props} />
-        )}
-        <Filters {...props} />
+          <Filters {...props} />
+        </div>
       </div>
-    </div>
-  )
+    )
+  } else {
+    return (
+      <div>
+        <RegionSidebar {...props} />
+        <Filters {...props} className="bottom-left m-4 mb-5" />
+      </div>
+    )
+  }
 }
 
 export default Sidebar

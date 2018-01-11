@@ -6,42 +6,83 @@ import { toCAD } from '../utils/formatUtils'
 import { FormControl } from 'material-ui/Form'
 import { MenuItem } from 'material-ui/Menu'
 import Select from 'material-ui/Select'
+import Button from 'material-ui/Button'
 
 const styles = {
   minWidth: '100%',
-  marginTop: '10px',
+  marginTop: '10px'
 }
 
-const RegionSidebar = ({ rent, property, mapFeatures, changeMetric }) => {
+const RegionSidebar = ({ rent, property, mapFeatures, changeMetric, removeSurvey }) => {
   const { neighborhood, city } = property
-  const { bedrooms } = mapFeatures
+  const { bedrooms, survay } = mapFeatures
+  if (rent.price && survay.length > 0) {
+    removeSurvey()
+  }
   return (
-    <div>
-      <h3>
-        {neighborhood}
-        {neighborhood && city && ', '}
-      </h3>
-      <hr />
-      <div>
-        <span>Average Rent</span>
-        <span className="float-right">{toCAD(rent.price)}</span>
+    <div className="top-left p-4 m-4 shadow rounded sidebar-region d-flex flex-column">
+      {rent.price ? (
+        <div>
+          <h4>
+            {neighborhood}
+            {neighborhood && city && ', '}
+          </h4>
+          <div className="lead">
+            <span>Average Rent</span>
+            <span className="float-right">{toCAD(rent.price)}</span>
+          </div>
+
+          {rent.count && (
+            <div className="text-muted">
+              <span># of Rentals</span>
+              <span className="float-right">{rent.count}</span>
+            </div>
+          )}
+
+          {rent.sqft > 0 && (
+            <div className="lead mt-2">
+              <span>Average Size</span>
+              <span className="float-right">
+                {rent.sqft} ft<sup>2</sup>
+              </span>
+            </div>
+          )}
+
+          <hr />
+        </div>
+      ) : (
+        <div className="text-center my-auto">
+          <h3>{survay}</h3>
+        </div>
+      )}
+      <div className="text-center mt-auto">
+        <div>Bedrooms</div>
+        <Button
+          onClick={() => changeMetric(1)}
+          dense
+          color={bedrooms === 1 ? 'primary' : 'default'}
+          raised
+        >
+          1
+        </Button>
+        <Button
+          onClick={() => changeMetric(2)}
+          dense
+          color={bedrooms === 2 ? 'primary' : 'default'}
+          raised
+          className="mx-2"
+        >
+          2
+        </Button>
+        <Button
+          onClick={() => changeMetric(3)}
+          dense
+          color={bedrooms === 3 ? 'primary' : 'default'}
+          raised
+        >
+          3 +
+        </Button>
       </div>
-      <div>
-        <span>Average SQFT</span>
-        <span className="float-right">{rent.sqft}</span>
-      </div>
-      <div>
-        <span>Count</span>
-        <span className="float-right">{rent.count}</span>
-      </div>
-      <hr />
-      <FormControl style={styles}>
-        <Select value={bedrooms} name="bedrooms" onChange={changeMetric}>
-          <MenuItem value={1}>1 Bedroom</MenuItem>
-          <MenuItem value={2}>2 Bedrooms</MenuItem>
-          <MenuItem value={3}>3+ Bedrooms</MenuItem>
-        </Select>
-      </FormControl>
     </div>
   )
 }

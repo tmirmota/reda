@@ -37,9 +37,7 @@ const PropertySidebar = ({ property }) => {
         {pid}
       </div>
       <hr />
-      <div className="sidebar-heading text-uppercase">
-        <strong>Property Details</strong>
-      </div>
+      <div className="sidebar-heading text-uppercase">Property Details</div>
       <div>
         <span>Year Built</span>
         <span className="float-right">{yearBuilt}</span>
@@ -50,16 +48,14 @@ const PropertySidebar = ({ property }) => {
       </div>
       <hr />
       <div className="sidebar-heading text-uppercase">
-        <strong>Assessment</strong>
+        Assessment
         <span className="float-right text-muted">
           <em>{assessmentYear}</em>
         </span>
       </div>
       <div className="mb-1">
-        <strong>
-          <span>Total Value</span>
-          <span className="float-right">{toCAD(totalAssessment)}</span>
-        </strong>
+        <span>Total Value</span>
+        <span className="float-right">{toCAD(totalAssessment)}</span>
       </div>
       <div>
         <span>Land</span>
@@ -80,9 +76,7 @@ const PropertySidebar = ({ property }) => {
         <span className="float-right text-muted">{bigImprovYear}</span>
       </div>
       <hr />
-      <div className="sidebar-heading text-uppercase">
-        <strong>Zoning</strong>
-      </div>
+      <div className="sidebar-heading text-uppercase">Zoning</div>
       <div>
         <a href={zoneUrl} target="_blank">
           {zone}

@@ -28,14 +28,35 @@
   min-height: 100%;
 }
 
+.sidebar-region {
+  min-width: 300px;
+  max-width: 300px;
+  min-height: 265px;
+}
+
 .shadow {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12), 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.top-left {
+  background: white;
+  position: absolute !important;
+  left: 0;
+  top: 0;
+  z-index: 100;
 }
 
 .bottom-right {
   position: absolute !important;
   bottom: 0;
   right: 0;
+}
+
+.bottom-left {
+  position: absolute !important;
+  bottom: 0;
+  left: 0;
+  z-index: 100;
 }
 
 .height-small {

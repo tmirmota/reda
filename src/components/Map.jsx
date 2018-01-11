@@ -5,6 +5,7 @@ import { addSources, addLayers } from '../utils/mapUtils'
 import mapboxgl from 'mapbox-gl'
 import MapboxGeocoder from 'mapbox-gl-geocoder'
 import { MAPBOX_ACCESS_TOKEN } from '../constants/ApiConstants'
+import { rentLayerID } from '../constants/MapConstants'
 
 class Map extends Component {
   render() {
@@ -23,11 +24,11 @@ class Map extends Component {
       hoverProperty,
       hoverPolygon,
       fetchDataLayers,
-      calcMinMax,
-      clearState,
+      addHeatMapLayer,
+      clearState
     } = this.props
 
-    const { lng, lat, zoom, style, maxBounds } = mapFeatures
+    const { lng, lat, zoom, style, maxBounds, bedrooms } = mapFeatures
 
     mapboxgl.accessToken = MAPBOX_ACCESS_TOKEN
 
@@ -35,22 +36,22 @@ class Map extends Component {
       container: this.mapContainer,
       style: `mapbox://${style}`,
       center: [lng, lat],
-      zoom,
-      maxBounds,
+      zoom
+      // maxBounds,
     })
 
     const popup = new mapboxgl.Popup({
       closeButton: false,
-      closeOnClick: false,
+      closeOnClick: false
     })
 
     map.addControl(
       new MapboxGeocoder({
         accessToken: MAPBOX_ACCESS_TOKEN,
         country: 'ca',
-        placeholder: 'Search address, street, neighborhood or city',
+        placeholder: 'Search address, street, neighborhood or city'
       }),
-      'top-left',
+      'top-right'
     )
 
     map.addControl(new mapboxgl.NavigationControl(), 'top-right')
@@ -59,30 +60,46 @@ class Map extends Component {
       storeMapnPopup(map, popup)
       addSources(map)
       addLayers(map)
-      // fetchDataLayers(map)
-      calcMinMax(map)
-      
-      map.addLayer({
-        id: 'census-tracts-fill-hover',
-        source: 'census-tracts',
-        'source-layer': 'census_tracts_2016geojson',
-        minzoom: 9,
-        maxzoom: 14,
-        type: 'line',
-        paint: {
-          'line-color': '#4fc3f7',
-          'line-width': 3
+
+      map.addLayer(
+        {
+          id: 'census-tracts-fill-hover',
+          source: 'census-tracts',
+          'source-layer': 'census_tracts_2016geojson',
+          minzoom: 9,
+          maxzoom: 14,
+          type: 'line',
+          paint: {
+            'line-color': '#4fc3f7',
+            'line-width': 3
+          },
+          filter: ['==', 'CTUID', '']
         },
-        filter: ['==', 'CTUID', '']
-      }, 'water')
+        'water'
+      )
 
+      // map.addLayer({
+      //   id: 'rentals',
+      //   source: 'master',
+      //   'source-layer': 'MASTER_Rentals_-_Sheet1_1-2q0rmg',
+      //   minzoom: 9,
+      //   maxzoom: 18,
+      //   type: 'circle',
+      //   paint: {
+      //     'circle-color': '#000000',
+      //     'circle-radius': 3
+      //   }
+      // })
 
-      map.on('mousemove', 'van-rents-by-ct-jan-08geojson', e => {
+      addHeatMapLayer(`bedroom_${bedrooms}_average_price`)
+      // fetchDataLayers(map)
+
+      map.on('mousemove', rentLayerID, e => {
         const filterName = e.features[0].properties['CTUID']
         map.setFilter('census-tracts-fill-hover', ['==', 'CTUID', filterName])
         hoverPolygon(e)
       })
-      map.on('mouseleave', 'van-rents-by-ct-jan-08geojson', () => {
+      map.on('mouseleave', rentLayerID, () => {
         map.setFilter('census-tracts-fill-hover', ['==', 'CTUID', ''])
         clearState()
       })

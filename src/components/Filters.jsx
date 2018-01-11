@@ -10,10 +10,10 @@ import Checkbox from 'material-ui/Checkbox'
 import ExpandMoreIcon from 'material-ui-icons/ExpandMore'
 
 const Filters = props => {
-  const { toggleZoning, toggleTransit, toggleSchools, toggleFire } = props
+  const { className, toggleZoning, toggleTransit, toggleSchools, toggleFire } = props
   const { zoning, transit, schools, fireHydrants } = props.filters
   return (
-    <div className="mt-auto mb-3">
+    <div className={className ? className : "mt-auto mb-3"}>
       <ExpansionPanel>
         <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
           Filters

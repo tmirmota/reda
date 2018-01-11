@@ -1,43 +1,50 @@
+export const rentLayerID = 'vanrentsbyctjan10geojson'
+
 export const sources = [
   {
     id: 'census-tracts',
     url: 'tmirmota.3u8wgv7d',
-    type: 'vector',
+    type: 'vector'
   },
   {
     id: 'dissemination-area',
     url: 'tmirmota.22vjwdw2',
-    type: 'vector',
+    type: 'vector'
   },
   {
     id: 'properties',
     url: 'tmirmota.69r2qz2u',
-    type: 'vector',
+    type: 'vector'
   },
   {
     id: 'zoning',
     url: 'tmirmota.5h7gkfwq',
-    type: 'vector',
+    type: 'vector'
   },
   {
     id: 'schools',
     url: 'tmirmota.7qw6uywz',
-    type: 'vector',
+    type: 'vector'
   },
   {
     id: 'fire-hydrants',
     url: 'tmirmota.1vk80tum',
-    type: 'vector',
+    type: 'vector'
   },
   {
     id: 'transit-lines',
     url: 'tmirmota.26nf1ybn',
-    type: 'vector',
+    type: 'vector'
   },
   {
     id: 'transit-stations',
     url: 'tmirmota.09jmh0eh',
-    type: 'vector',
+    type: 'vector'
+  },
+  {
+    id: 'master',
+    url: 'tmirmota.blfuhhwu',
+    type: 'vector'
   },
 ]
 
@@ -61,8 +68,8 @@ export const additionalBaseLayers = [
     sourceLayer: 'property_parcel_polygonsgeojson',
     minzoom: 14,
     maxzoom: 22,
-    filter: 'Name',
-  },
+    filter: 'Name'
+  }
 ]
 
 export const additionalBaseStyles = [
@@ -71,18 +78,18 @@ export const additionalBaseStyles = [
     type: 'fill',
     paint: {
       'fill-opacity': 0.1,
-      'fill-color': '#651fff',
+      'fill-color': '#651fff'
     },
-    hasFilter: false,
+    hasFilter: false
   },
   {
     id: '-fill-hover',
     type: 'fill',
     paint: {
       'fill-opacity': 0.5,
-      'fill-color': '#64ffda',
+      'fill-color': '#64ffda'
     },
-    hasFilter: true,
+    hasFilter: true
   },
   {
     id: '-line',
@@ -90,8 +97,8 @@ export const additionalBaseStyles = [
     paint: {
       'line-color': '#651fff',
       'line-opacity': 0.1,
-      'line-width': 2,
-    },
+      'line-width': 2
+    }
   },
   {
     id: '-line-hover',
@@ -99,18 +106,18 @@ export const additionalBaseStyles = [
     paint: {
       'line-color': '#64ffda',
       'line-opacity': 0.5,
-      'line-width': 2,
+      'line-width': 2
     },
-    hasFilter: true,
+    hasFilter: true
   },
   {
     id: '-fill-click',
     type: 'fill',
     paint: {
-      'fill-color': '#f50057',
+      'fill-color': '#f50057'
     },
-    hasFilter: true,
-  },
+    hasFilter: true
+  }
 ]
 
 export const zoneFill = {
@@ -122,6 +129,16 @@ export const zoneFill = {
   type: 'fill',
   paint: {
     'fill-opacity': 0.0,
-    'fill-color': '#FFFFFF',
-  },
+    'fill-color': '#FFFFFF'
+  }
 }
+
+export const heatStops = [
+  '#ffff00',
+  '#ffea00',
+  '#ffd600',
+  '#ffab00',
+  '#ff6d00',
+  '#dd2c00',
+  '#ff3d00'
+]

@@ -13,6 +13,7 @@ export const SET_MAP = 'SET_MAP'
 export const UPDATE_COORDINATES = 'UPDATE_COORDINATES'
 export const UPDATE_RENTS = 'UPDATE_RENTS'
 export const UPDATE_METRIC = 'UPDATE_HEATMAP_DATA'
+export const REMOVE_SURVEY = 'REMOVE_SURVEY'
 
 // Property
 export const UPDATE_ADDRESS = 'UPDATE_ADDRESS'

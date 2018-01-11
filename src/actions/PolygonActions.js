@@ -1,4 +1,5 @@
 import * as types from '../constants/ActionTypes'
+import { pointOnFeature } from '@turf/turf'
 import { toCAD } from '../utils/formatUtils'
 import { queryNeighborhood } from '../actions/PropertyActions'
 
@@ -6,18 +7,16 @@ export const displayPopup = (location, value) => (dispatch, getState) => {
   const { property, mapFeatures } = getState()
   const { map, popup, bedrooms } = mapFeatures
 
-  const features = map.queryRenderedFeatures(location.point, {
-    layers: ['census-tracts-2016geojson']
-  })
-
-  if (features.length > 0 && value > 0) {
+  if (value > 0) {
     map.getCanvas().style.cursor = 'pointer'
+
+    // const pointOnPolygon = pointOnFeature(location.features[0])
 
     const popupText = `
       <div class="width-150">
         <h5>${toCAD(value)}<span> / ${bedrooms}  bdr</span></h5>
         <div>AVERAGE RENT</div>
-        <div class="text-muted">In ${property.neighborhood}</div>
+        ${property.neighborhood ? `<div class="text-muted">In ${property.neighborhood}</div>` : ''}
       </div>`
     popup
       .setLngLat(location.lngLat)

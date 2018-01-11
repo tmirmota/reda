@@ -68,7 +68,7 @@ const fetchProperty = pcoord => async dispatch => {
 export const queryNeighborhood = e => (dispatch, getState) => {
   const { map } = getState().mapFeatures
   const vanFeatures = map.queryRenderedFeatures(e.point, {
-    layers: ['van-neighborhoodsgeojson'],
+    layers: ['cov-localareasgeojson'],
   })
   if (vanFeatures.length > 0) {
     const { Name } = vanFeatures[0].properties
@@ -103,9 +103,10 @@ export const selectProperty = e => (dispatch, getState) => {
 }
 
 export const hoverProperty = e => (dispatch, getState) => {
-  const { property } = getState()
+  const { property, mapFeatures } = getState()
   const { Description } = e.features[0].properties
   const { pcoord, number, street } = getPropertyDescription(Description)
+  mapFeatures.popup.remove()
   if (property.pcoord !== pcoord) {
     dispatch(updateAddress(number, street, pcoord))
     dispatch(fetchProperty(pcoord))

@@ -5,7 +5,7 @@ import {
   storeMapnPopup,
   updateCoordinates,
   fetchDataLayers,
-  calcMinMax,  
+  addHeatMapLayer,
   clearState,
 } from '../actions/MapActions'
 import { hoverProperty } from '../actions/PropertyActions'
@@ -21,6 +21,6 @@ export default connect(mapStateToProps, {
   hoverProperty,
   hoverPolygon,
   fetchDataLayers,
-  calcMinMax,
+  addHeatMapLayer,
   clearState,
 })(MapComponent)

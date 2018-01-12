@@ -1,6 +1,7 @@
 import React from 'react'
 
 import { toCAD } from '../utils/formatUtils'
+import { typeFormLink } from '../constants/MapConstants'
 
 const PropertySidebar = ({ property }) => {
   const {
@@ -88,6 +89,9 @@ const PropertySidebar = ({ property }) => {
         <span>{legalType}</span>
       </div>
       <hr />
+      <div>
+      <p className="mt-3">We're interested in<br/><a href={typeFormLink} target="_blank">what you think.</a></p>
+        </div>
     </div>
   )
 }

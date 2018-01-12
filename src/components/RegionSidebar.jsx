@@ -1,6 +1,7 @@
 import React from 'react'
 
 import { toCAD } from '../utils/formatUtils'
+import { typeFormLink } from '../constants/MapConstants'
 
 // Material UI
 import { FormControl } from 'material-ui/Form'
@@ -48,7 +49,9 @@ const RegionSidebar = ({ rent, property, mapFeatures, changeMetric }) => {
           <hr />
         </div>
       ) : (
-        <div className="text-center my-auto">
+        <div className="my-auto">
+          <h3>Uptown</h3>
+          <p className="mt-3">We're interested in <a href={typeFormLink} target="_blank">what you think.</a></p>
         </div>
       )}
       <div className="text-center mt-auto">

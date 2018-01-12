@@ -1,4 +1,5 @@
 export const rentLayerID = 'vanrentsbyctjan10geojson'
+export const typeFormLink = 'https://uptownapp.typeform.com/to/Mx3yJU'
 
 export const sources = [
   {

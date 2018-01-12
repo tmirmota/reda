@@ -133,7 +133,3 @@ export const changeMetric = (value) => (dispatch, getState) => {
   dispatch(addHeatMapLayer(metric))
   dispatch({ type: types.UPDATE_METRIC, name: 'bedrooms', value })
 }
-
-export const removeSurvey = () => ({
-  type: types.REMOVE_SURVEY
-})

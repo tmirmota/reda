@@ -9,7 +9,6 @@ const initialState = {
     [-123.29430051866589, 49.15593259948497],
     [-122.89152688587282, 49.34756088632997],
   ],
-  survay: 'Survay',
   bedrooms: 1
 }
 
@@ -37,12 +36,6 @@ const map = (state = initialState, action) => {
         [action.name]: action.value,
       }
     
-      case types.REMOVE_SURVEY:
-        return {
-          ...state,
-          survay: ''
-        }
-
     default:
       return state
   }

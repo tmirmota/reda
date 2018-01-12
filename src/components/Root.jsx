@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import '../App.css'
 
 // Containers
 import SidebarContainer from '../containers/SidebarContainer'

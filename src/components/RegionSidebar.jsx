@@ -13,12 +13,9 @@ const styles = {
   marginTop: '10px'
 }
 
-const RegionSidebar = ({ rent, property, mapFeatures, changeMetric, removeSurvey }) => {
+const RegionSidebar = ({ rent, property, mapFeatures, changeMetric }) => {
   const { neighborhood, city } = property
-  const { bedrooms, survay } = mapFeatures
-  if (rent.price && survay.length > 0) {
-    removeSurvey()
-  }
+  const { bedrooms } = mapFeatures
   return (
     <div className="top-left p-4 m-4 shadow rounded sidebar-region d-flex flex-column">
       {rent.price ? (
@@ -52,7 +49,6 @@ const RegionSidebar = ({ rent, property, mapFeatures, changeMetric, removeSurvey
         </div>
       ) : (
         <div className="text-center my-auto">
-          <h3>{survay}</h3>
         </div>
       )}
       <div className="text-center mt-auto">

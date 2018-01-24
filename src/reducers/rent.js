@@ -9,11 +9,7 @@ const initialState = {
 const rent = (state = initialState, action) => {
   switch (action.type) {
     case types.UPDATE_RENT:
-      return {
-        price: action.rent.price,
-        count: action.rent.count,
-        sqft: action.rent.sqft
-      }
+      return action.rent
 
     case types.RESET_RENT:
       return initialState

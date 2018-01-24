@@ -27,6 +27,8 @@ export const fetchPlace = lngLat => async dispatch => {
 }
 
 const fetchProperty = pcoord => async dispatch => {
+  const response = await fetch('https://reda-188106.appspot.com/')
+  
   const url = `${PROPERTY_TAX_URL.replace(':pcoord', pcoord)}`
   const { json } = await apiFetch(url)
   if (json) {

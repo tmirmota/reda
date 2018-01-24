@@ -8,3 +8,4 @@ export const REVERSE_GEOCODE_URL = `${HOST_MAPBOX}/geocoding/v5/mapbox.places/:q
 export const PROPERTY_TAX_URL = `${HOST_REDA}/property-tax?pcoord=:pcoord`
 export const INCOME_URL = `${HOST_REDA}/income?ctuid=:ctuid`
 export const RENT_URL = `${HOST_REDA}/rent?ctname=:ctname`
+export const CTS_URL = `${HOST_REDA}/census-tract`

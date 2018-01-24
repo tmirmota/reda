@@ -1,15 +1,16 @@
 import * as types from '../constants/ActionTypes'
 
 const initialState = {
-  style: 'styles/tmirmota/cjc9z5vs60eo82rloxm41wx5o',
+  style: 'styles/tmirmota/cjcsggrra048b2ro9d5mq7gzp',
   lat: 49.261069,
   lng: -123.1427207,
-  zoom: 12,
+  zoom: 11,
   maxBounds: [
     [-123.29430051866589, 49.15593259948497],
     [-122.89152688587282, 49.34756088632997],
   ],
-  bedrooms: 1
+  bedrooms: [1],
+  redoSearch: false
 }
 
 const map = (state = initialState, action) => {
@@ -34,6 +35,18 @@ const map = (state = initialState, action) => {
       return {
         ...state,
         [action.name]: action.value,
+      }
+    
+    case types.SHOW_REDO_SEARCH:
+      return {
+        ...state,
+        redoSearch: true
+      }
+    
+    case types.HIDE_REDO_SEARCH:
+      return {
+        ...state,
+        redoSearch: false
       }
     
     default:

@@ -14,6 +14,8 @@ export const UPDATE_COORDINATES = 'UPDATE_COORDINATES'
 export const UPDATE_RENTS = 'UPDATE_RENTS'
 export const UPDATE_METRIC = 'UPDATE_HEATMAP_DATA'
 export const REMOVE_SURVEY = 'REMOVE_SURVEY'
+export const SHOW_REDO_SEARCH = 'SHOW_REDO_SEARCH'
+export const HIDE_REDO_SEARCH = 'HIDE_REDO_SEARCH'
 
 // Property
 export const UPDATE_ADDRESS = 'UPDATE_ADDRESS'
@@ -24,6 +26,9 @@ export const UPDATE_NEIGHBORHOOD = 'UPDATE_NEIGHBORHOOD'
 // Rent
 export const UPDATE_RENT = 'UPDATE_RENT'
 export const RESET_RENT = 'CLEAR_RENT'
+
+// Rents
+export const FETCH_RENTS = 'FETCH_RENTS'
 
 // SelectedProperty
 export const REMOVE_SELECTED_PROPERTY = 'REMOVE_SELECTED_PROPERTY'

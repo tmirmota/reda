@@ -1,11 +1,11 @@
 import React, { Component } from 'react'
 import { addSources, addLayers } from '../utils/mapUtils'
+import { CTS_URL } from '../constants/ApiConstants'
 
 // Mapbox
 import mapboxgl from 'mapbox-gl'
 import MapboxGeocoder from 'mapbox-gl-geocoder'
 import { MAPBOX_ACCESS_TOKEN } from '../constants/ApiConstants'
-import { rentLayerID } from '../constants/MapConstants'
 
 class Map extends Component {
   render() {
@@ -23,15 +23,15 @@ class Map extends Component {
       updateCoordinates,
       hoverProperty,
       hoverPolygon,
-      fetchDataLayers,
       addHeatMapLayer,
+      showRedoSearch,
+      fetchRents,
       clearState
     } = this.props
 
     const { lng, lat, zoom, style, maxBounds, bedrooms } = mapFeatures
 
     mapboxgl.accessToken = MAPBOX_ACCESS_TOKEN
-
     const map = new mapboxgl.Map({
       container: this.mapContainer,
       style: `mapbox://${style}`,
@@ -39,12 +39,11 @@ class Map extends Component {
       zoom
       // maxBounds,
     })
-
     const popup = new mapboxgl.Popup({
       closeButton: false,
       closeOnClick: false
     })
-
+    
     map.addControl(
       new MapboxGeocoder({
         accessToken: MAPBOX_ACCESS_TOKEN,
@@ -60,6 +59,7 @@ class Map extends Component {
       storeMapnPopup(map, popup)
       addSources(map)
       addLayers(map)
+      fetchRents()
 
       map.addLayer(
         {
@@ -81,7 +81,7 @@ class Map extends Component {
       // map.addLayer({
       //   id: 'rentals',
       //   source: 'master',
-      //   'source-layer': 'MASTER_Rentals_-_Sheet1_1-2q0rmg',
+      //   'source-layer': 'MASTER_Rentals_-_Sheet1-8ueqwl',
       //   minzoom: 9,
       //   maxzoom: 18,
       //   type: 'circle',
@@ -92,14 +92,13 @@ class Map extends Component {
       // })
 
       addHeatMapLayer(`bedroom_${bedrooms}_average_price`)
-      // fetchDataLayers(map)
 
-      map.on('mousemove', rentLayerID, e => {
+      map.on('mousemove', 'census-tracts-2016geojson', e => {
         const filterName = e.features[0].properties['CTUID']
         map.setFilter('census-tracts-fill-hover', ['==', 'CTUID', filterName])
         hoverPolygon(e)
       })
-      map.on('mouseleave', rentLayerID, () => {
+      map.on('mouseleave', 'census-tracts-2016geojson', () => {
         map.setFilter('census-tracts-fill-hover', ['==', 'CTUID', ''])
         clearState()
       })
@@ -115,6 +114,7 @@ class Map extends Component {
       })
 
       map.on('move', () => {
+        showRedoSearch()
         updateCoordinates(map)
       })
     })

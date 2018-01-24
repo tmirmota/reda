@@ -1,4 +1,3 @@
-export const rentLayerID = 'vanrentsbyctjan10geojson'
 export const typeFormLink = 'https://uptownapp.typeform.com/to/Mx3yJU'
 
 export const sources = [
@@ -44,7 +43,7 @@ export const sources = [
   },
   {
     id: 'master',
-    url: 'tmirmota.blfuhhwu',
+    url: 'tmirmota.5qxz8xc3',
     type: 'vector'
   },
 ]

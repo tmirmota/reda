@@ -25,6 +25,7 @@ class Map extends Component {
     const {
       storeMapnPopup,
       fetchRents,
+      addHeatMapLayer,
       hoverProperty,
       hoverPolygon,
       showRedoSearch,
@@ -54,9 +55,27 @@ class Map extends Component {
 
     map.on('load', () => {
       storeMapnPopup(map, popup)
-      // addSources(map)
-      // addLayers(map)
+      addSources(map)
+      addLayers(map)
       fetchRents()
+      addHeatMapLayer()
+
+      map.addLayer(
+        {
+          id: 'census-tracts-fill-hover',
+          source: 'census-tracts',
+          'source-layer': 'census_tracts_2016geojson',
+          minzoom: 9,
+          maxzoom: 14,
+          type: 'line',
+          paint: {
+            'line-color': '#4fc3f7',
+            'line-width': 3
+          },
+          filter: ['==', 'CTUID', '']
+        },
+        'water'
+      )
 
       map.on('mousemove', 'census-tracts-2016geojson', e => {
         hoverPolygon(e)

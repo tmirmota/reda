@@ -23,6 +23,11 @@ export const typeFormLink = 'https://uptownapp.typeform.com/to/Mx3yJU'
 
 export const sources = [
   {
+    id: 'census-tracts',
+    url: 'tmirmota.3u8wgv7d',
+    type: 'vector'
+  },
+  {
     id: 'properties',
     url: 'tmirmota.69r2qz2u',
     type: 'vector'

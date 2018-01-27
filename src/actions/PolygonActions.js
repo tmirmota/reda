@@ -1,5 +1,4 @@
 import * as types from '../constants/ActionTypes'
-import { pointOnFeature } from '@turf/turf'
 import { toCAD } from '../utils/formatUtils'
 import { queryNeighborhood } from '../actions/PropertyActions'
 
@@ -37,8 +36,8 @@ export const hoverPolygon = e => (dispatch, getState) => {
 
   popup.remove()
   map.getCanvas().style.cursor = ''
-  // const filterName = e.features[0].properties['CTUID']
-  // map.setFilter('census-tracts-fill-hover', ['==', 'CTUID', filterName])
+  const filterName = e.features[0].properties['CTUID']
+  map.setFilter('census-tracts-fill-hover', ['==', 'CTUID', filterName])
 
   const rent = rents.find(rent => rent.ctuid === ctuid)
 

@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import { addSources, addLayers } from '../utils/mapUtils'
-import { CTS_URL } from '../constants/ApiConstants'
 
 // Mapbox
 import mapboxgl from 'mapbox-gl'

@@ -11,7 +11,7 @@ import Button from 'material-ui/Button'
 
 const styles = {
   minWidth: '100%',
-  marginTop: '10px'
+  marginTop: '10px',
 }
 
 const RegionSidebar = ({
@@ -19,7 +19,7 @@ const RegionSidebar = ({
   property,
   mapFeatures,
   changeMetric,
-  addHeatMapLayer
+  fetchRents,
 }) => {
   const { neighborhood, city } = property
   const { bedrooms, redoSearch } = mapFeatures
@@ -61,44 +61,27 @@ const RegionSidebar = ({
           </p>
         </div>
       )}
-      {/* <div className="mt-auto">
+      <div className="mt-auto">
         <div className="my-2">
           <i className="fa fa-bed pr-2" aria-hidden="true" />Bedrooms
         </div>
-        <Button
-          fab
-          mini
-          onClick={() => changeMetric(1)}
-          dense
-          color={bedrooms === 1 ? 'primary' : 'default'}
-          raised
-        >
-          1
-        </Button>
-        <Button
-          fab
-          mini
-          onClick={() => changeMetric(2)}
-          dense
-          color={bedrooms === 2 ? 'primary' : 'default'}
-          raised
-          className="mx-2"
-        >
-          2
-        </Button>
-        <Button
-          fab
-          mini
-          onClick={() => changeMetric(3)}
-          dense
-          color={bedrooms === 3 ? 'primary' : 'default'}
-          raised
-        >
-          3+
-        </Button>
-      </div> */}
+        {bedrooms.map((bedroom, index) => (
+          <Button
+            key={index}
+            fab
+            mini
+            onClick={() => changeMetric("bedrooms", bedroom)}
+            dense
+            color={bedroom.value ? 'primary' : 'default'}
+            raised
+          >
+            {bedroom.num}
+            {bedrooms.length - 1 === index ? '+' : ''}
+          </Button>
+        ))}
+      </div>
       <div className="text-center mt-auto">
-        {redoSearch && <Button onClick={addHeatMapLayer}>Focus View</Button>}
+        {redoSearch && <Button onClick={fetchRents}>Focus View</Button>}
       </div>
     </div>
   )

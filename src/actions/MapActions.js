@@ -1,5 +1,4 @@
 import * as types from '../constants/ActionTypes'
-import { apiFetch } from '../utils/apiUtils'
 import { fetchRents } from '../actions/RentActions'
 
 export const initMap = (map, popup) => dispatch => {
@@ -8,9 +7,8 @@ export const initMap = (map, popup) => dispatch => {
 }
 
 export const clearState = () => ({
-  type: types.RESET_STATE
+  type: types.RESET_STATE,
 })
-
 
 export const addHeatMapLayer = rents => async (dispatch, getState) => {
   const { map } = getState().mapFeatures
@@ -52,7 +50,7 @@ export const addHeatMapLayer = rents => async (dispatch, getState) => {
       property: 'CTUID',
       type: 'categorical',
       default: 'transparent',
-      stops: fillStops
+      stops: fillStops,
     }
 
     map.setPaintProperty('census-tracts-2016geojson', 'fill-opacity', 1)
@@ -60,7 +58,7 @@ export const addHeatMapLayer = rents => async (dispatch, getState) => {
     map.setPaintProperty(
       'census-tracts-2016geojson',
       'fill-outline-color',
-      paint
+      paint,
     )
 
     dispatch({
@@ -68,16 +66,15 @@ export const addHeatMapLayer = rents => async (dispatch, getState) => {
       beginColor,
       endColor,
       minValue,
-      maxValue
+      maxValue,
     })
     dispatch({ type: types.HIDE_REDO_SEARCH })
   }
 }
 
-export const changeMetric = value => (dispatch, getState) => {
-  const metric = `bedroom_${value}_average_price`
-  dispatch(addHeatMapLayer(metric))
-  dispatch({ type: types.UPDATE_METRIC, name: 'bedrooms', value })
+export const changeMetric = (name, metric) => dispatch => {
+  dispatch({ type: types.UPDATE_METRIC, name, ...metric })
+  dispatch(fetchRents())
 }
 
 export const showRedoSearch = () => ({ type: types.SHOW_REDO_SEARCH })

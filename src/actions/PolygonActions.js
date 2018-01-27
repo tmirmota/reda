@@ -9,8 +9,6 @@ export const displayPopup = (location, value) => (dispatch, getState) => {
   if (value > 0) {
     map.getCanvas().style.cursor = 'pointer'
 
-    // const pointOnPolygon = pointOnFeature(location.features[0])
-
     const popupText = `
       <div class="width-150">
         <h5>${toCAD(value)}<span></span></h5>

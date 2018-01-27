@@ -3,8 +3,6 @@ import { connect } from 'react-redux'
 import Map from '../components/Map'
 import {
   storeMapnPopup,
-  updateCoordinates,
-  addHeatMapLayer,
   showRedoSearch,
   clearState,
 } from '../actions/MapActions'
@@ -18,10 +16,8 @@ const mapStateToProps = ({ mapFeatures }) => ({ mapFeatures })
 
 export default connect(mapStateToProps, {
   storeMapnPopup,
-  updateCoordinates,
   hoverProperty,
   hoverPolygon,
-  addHeatMapLayer,
   fetchRents,
   showRedoSearch,
   clearState,

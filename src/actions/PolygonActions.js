@@ -34,10 +34,13 @@ export const hoverPolygon = e => (dispatch, getState) => {
   const { map, popup, bedrooms } = mapFeatures
 
   const ctuid = e.features[0].properties['CTUID']
-  const rent = rents.find(rent => rent.ctuid === ctuid)
 
   popup.remove()
   map.getCanvas().style.cursor = ''
+  // const filterName = e.features[0].properties['CTUID']
+  // map.setFilter('census-tracts-fill-hover', ['==', 'CTUID', filterName])
+
+  const rent = rents.find(rent => rent.ctuid === ctuid)
 
   if (rent) {
     dispatch(displayPopup(e, rent.average_price))

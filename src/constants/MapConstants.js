@@ -1,16 +1,27 @@
+export const initialMap = {
+  style: 'mapbox://styles/tmirmota/cjcsggrra048b2ro9d5mq7gzp',
+  center: [-123.1427207, 49.261069],
+  zoom: 11,
+  // maxBounds: [
+  //   [-123.29430051866589, 49.15593259948497],
+  //   [-122.89152688587282, 49.34756088632997],
+  // ],
+}
+
+export const initialPopup = {
+  closeButton: false,
+  closeOnClick: false,
+}
+
+export const configSearch = {
+  country: 'ca',
+  placeholder: 'Search address, street, neighborhood or city',
+}
+
+
 export const typeFormLink = 'https://uptownapp.typeform.com/to/Mx3yJU'
 
 export const sources = [
-  {
-    id: 'census-tracts',
-    url: 'tmirmota.3u8wgv7d',
-    type: 'vector'
-  },
-  {
-    id: 'dissemination-area',
-    url: 'tmirmota.22vjwdw2',
-    type: 'vector'
-  },
   {
     id: 'properties',
     url: 'tmirmota.69r2qz2u',
@@ -41,28 +52,9 @@ export const sources = [
     url: 'tmirmota.09jmh0eh',
     type: 'vector'
   },
-  {
-    id: 'master',
-    url: 'tmirmota.5qxz8xc3',
-    type: 'vector'
-  },
 ]
 
 export const additionalBaseLayers = [
-  // {
-  //   source: 'census-tracts',
-  //   sourceLayer: 'census_tracts_2016geojson',
-  //   minzoom: 9,
-  //   maxzoom: 14,
-  //   filter: 'CTUID',
-  // },
-  // {
-  //   source: 'dissemination-area',
-  //   sourceLayer: 'dissemination_areageojson',
-  //   minzoom: 11,
-  //   maxzoom: 14,
-  //   filter: 'DAUID',
-  // },
   {
     source: 'properties',
     sourceLayer: 'property_parcel_polygonsgeojson',
@@ -132,13 +124,3 @@ export const zoneFill = {
     'fill-color': '#FFFFFF'
   }
 }
-
-export const heatStops = [
-  '#ffff00',
-  '#ffea00',
-  '#ffd600',
-  '#ffab00',
-  '#ff6d00',
-  '#dd2c00',
-  '#ff3d00'
-]

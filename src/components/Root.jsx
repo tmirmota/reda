@@ -10,7 +10,7 @@ import ErrorMessage from '../components/ErrorMessage'
 
 class Root extends Component {
   render() {
-    if (window.innerWidth <= 768) return <ErrorMessage />
+    // if (window.innerWidth <= 768) return <ErrorMessage />
     return (
       <section className="container-fluid h-100 no-bleed">
         <div className="row h-100">

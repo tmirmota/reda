@@ -19,14 +19,13 @@ const map = (state = initialState, action) => {
       }
 
     case types.UPDATE_METRIC:
-      const { name, num, value } = action
+      const { name } = action
       return {
         ...state,
-        [name]: state[name].map(metric => {
-          if (metric.num === num) {
-            return {num, value}
-          } else {
-            return metric
+        [name]: state[name].map(({ num, value }) => {
+          return {
+            num,
+            value: num === action.num ? !action.value : false
           }
         })
       }

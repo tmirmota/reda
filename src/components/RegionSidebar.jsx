@@ -51,7 +51,7 @@ const RegionSidebar = ({
           )}
         </div>
       ) : (
-        <div className="my-auto">
+        <div>
           <h3>Uptown</h3>
           <p className="mt-3">
             We're interested in{' '}
@@ -70,10 +70,11 @@ const RegionSidebar = ({
             key={index}
             fab
             mini
-            onClick={() => changeMetric("bedrooms", bedroom)}
+            onClick={() => changeMetric('bedrooms', bedroom)}
             dense
             color={bedroom.value ? 'primary' : 'default'}
             raised
+            className="mr-2"
           >
             {bedroom.num}
             {bedrooms.length - 1 === index ? '+' : ''}
@@ -81,7 +82,7 @@ const RegionSidebar = ({
         ))}
       </div>
       <div className="text-center mt-auto">
-        {redoSearch && <Button onClick={fetchRents}>Focus View</Button>}
+        {redoSearch && <Button color="primary" onClick={fetchRents}>Focus View</Button>}
       </div>
     </div>
   )

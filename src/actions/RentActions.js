@@ -8,11 +8,15 @@ export const fetchRents = () => async (dispatch, getState) => {
   const arrBeds = bedrooms.reduce((arr, bedroom) => {
     const { num, value } = bedroom
     if (value) {
-      return arr.push(num)
+      arr.push(num)
+      return arr
     } else {
       return arr
     }
   }, [])
+
+  console.log(arrBeds);
+  
 
   const bounds = map.getBounds()
   const sw = bounds.getSouthWest()

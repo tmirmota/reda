@@ -5,13 +5,14 @@ import { queryNeighborhood } from '../actions/PropertyActions'
 export const displayPopup = (location, value) => (dispatch, getState) => {
   const { property, mapFeatures } = getState()
   const { map, popup, bedrooms } = mapFeatures
+  const {num} = bedrooms.find(bdr => bdr.value)
 
   if (value > 0) {
     map.getCanvas().style.cursor = 'pointer'
 
     const popupText = `
       <div class="width-150">
-        <h5>${toCAD(value)}<span></span></h5>
+        <h5>${toCAD(value)} / ${num} bdr<span></span></h5>
         <div>AVERAGE RENT</div>
         ${
           property.neighborhood

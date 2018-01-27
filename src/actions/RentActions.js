@@ -1,6 +1,7 @@
 import * as types from '../constants/ActionTypes'
 import { CTS_URL } from '../constants/ApiConstants'
 import { apiFetch } from '../utils/apiUtils'
+import { addHeatMapLayer } from './MapActions';
 
 export const fetchRents = () => async (dispatch, getState) => {
   const { map, bedrooms } = getState().mapFeatures
@@ -18,5 +19,6 @@ export const fetchRents = () => async (dispatch, getState) => {
       type: types.FETCH_RENTS,
       rents: json
     })
+    dispatch(addHeatMapLayer())
   }
 }

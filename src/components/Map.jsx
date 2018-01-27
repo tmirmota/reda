@@ -23,9 +23,7 @@ class Map extends Component {
   }
   componentDidMount() {
     const {
-      storeMapnPopup,
-      fetchRents,
-      addHeatMapLayer,
+      initMap,
       hoverProperty,
       hoverPolygon,
       showRedoSearch,
@@ -54,11 +52,9 @@ class Map extends Component {
     map.addControl(new mapboxgl.NavigationControl(), 'top-right')
 
     map.on('load', () => {
-      storeMapnPopup(map, popup)
+      initMap(map, popup)
       addSources(map)
       addLayers(map)
-      fetchRents()
-      addHeatMapLayer()
 
       map.addLayer(
         {

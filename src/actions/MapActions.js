@@ -1,51 +1,36 @@
 import * as types from '../constants/ActionTypes'
-import { CTS_URL } from '../constants/ApiConstants'
 import { apiFetch } from '../utils/apiUtils'
 import { fetchRents } from '../actions/RentActions'
+
+export const initMap = (map, popup) => dispatch => {
+  dispatch({ type: types.SET_MAP, map, popup })
+  dispatch(fetchRents())
+}
 
 export const clearState = () => ({
   type: types.RESET_STATE
 })
 
-export const updateCoordinates = map => dispatch => {
-  const { lng, lat } = map.getCenter()
-  dispatch({ type: types.UPDATE_COORDINATES, lng, lat, zoom: map.getZoom() })
-}
 
-export const storeMapnPopup = (map, popup) => ({
-  type: types.SET_MAP,
-  map,
-  popup
-})
+export const addHeatMapLayer = rents => async (dispatch, getState) => {
+  const { map } = getState().mapFeatures
 
-export const addHeatMapLayer = () => async (dispatch, getState) => {
-  const { map, bedrooms } = getState().mapFeatures
-
-  const bounds = map.getBounds()
-  const sw = bounds.getSouthWest()
-  const ne = bounds.getNorthEast()
-  const url = `${CTS_URL}?swlng=${sw.lng}&swlat=${sw.lat}&nelng=${
-    ne.lng
-  }&nelat=${ne.lat}&bedrooms=${bedrooms}`
-
-  const { json } = await apiFetch(url)
-
-  if (json) {
-    const minValue = json.reduce((min, feature) => {
+  if (rents) {
+    const minValue = rents.reduce((min, feature) => {
       const minPrice = feature.average_price
       return minPrice !== 0 && minPrice < min ? minPrice : min
     }, 0)
 
-    const maxValue = json.reduce((max, feature) => {
+    const maxValue = rents.reduce((max, feature) => {
       const maxPrice = feature.average_price
       return maxPrice > max ? maxPrice : max
-    }, json[0].average_price)
+    }, rents[0].average_price)
 
     let fillStops = []
     let beginColor
     let endColor
 
-    json.map(feature => {
+    rents.map(feature => {
       const value = feature.average_price
       if (value > 0) {
         const percent = Math.min((value - minValue) / (maxValue - minValue), 1)

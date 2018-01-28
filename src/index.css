@@ -1,5 +1,8 @@
 @import url('https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css');
-/* @import url('https://fonts.googleapis.com/css?family=Roboto?100,300'); */
+
+/* =========================================================
+GLOBAL 
+========================================================= */
 
 html,
 body {
@@ -13,17 +16,44 @@ body {
   font-size: 16px;
 }
 
-h4 {
-  font-family: Futura, "Trebuchet MS", Arial, sans-serif !important;
+h3, h4, h6 {
+  font-family: Futura, 'Trebuchet MS', Arial, sans-serif !important;
 }
 
 h3 {
-  font-family: Futura, "Trebuchet MS", Arial, sans-serif !important;
-  color: rgba(0,0,0,0.24);
+  color: rgba(0, 0, 0, 0.24);
 }
 
-#root {
-  height: 100%;
+/* =========================================================
+OVERLAY COMPONENTS 
+========================================================= */
+
+/* Desktop */
+
+@media (min-width: 768px) {
+  .legend {
+    position: absolute !important;
+    bottom: 0;
+    right: 0;
+    min-width: 225px;
+    padding: 1.5rem!important;
+    margin-bottom: 1.5rem!important;
+    margin-right: 1rem!important;
+  }
+}
+
+/* Mobile */
+
+@media (max-width: 768px) {
+  .legend {
+    position: absolute !important;
+    top: 10px;
+    left: 10px;
+    padding: 1rem!important;
+  }
+  .census-tract {
+    display: none !important;
+  }
 }
 
 .sidebar {
@@ -40,10 +70,6 @@ h3 {
   margin-bottom: 3px;
 }
 
-.mapboxgl-ctrl-geocoder {
-  min-width: 300px !important;
-}
-
 .sidebar-filters {
   bottom: 0;
   position: absolute;
@@ -56,14 +82,25 @@ h3 {
   min-height: 100%;
 }
 
-.sidebar-region {
+/* =========================================================
+MAPBOX 
+========================================================= */
+
+.mapboxgl-ctrl-geocoder {
+  min-width: 300px !important;
+}
+
+/* =========================================================
+GENERAL
+========================================================= */
+
+.fixed-w-300 {
   min-width: 300px;
   max-width: 300px;
-  min-height: 320px;
 }
 
 .shadow {
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12), 0 2px 5px rgba(0, 0, 0, 0.1);
+  
 }
 
 .top-left {

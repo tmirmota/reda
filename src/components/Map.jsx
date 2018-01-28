@@ -36,11 +36,10 @@ class Map extends Component {
       ...initialMap,
     })
 
-    const popup = new mapboxgl.Popup({
-      ...initialPopup,
-    })
+    const desktop = window.innerWidth >= 768
 
-    // map.addControl(
+    if (desktop) {
+          // map.addControl(
     //   new MapboxGeocoder({
     //     accessToken: MAPBOX_ACCESS_TOKEN,
     //     ...configSearch,
@@ -48,7 +47,12 @@ class Map extends Component {
     //   'top-right',
     // )
 
-    map.addControl(new mapboxgl.NavigationControl(), 'top-right')
+      map.addControl(new mapboxgl.NavigationControl(), 'top-right')
+    }
+
+    const popup = new mapboxgl.Popup({
+      ...initialPopup,
+    })  
 
     map.on('load', () => {
       initMap(map, popup)

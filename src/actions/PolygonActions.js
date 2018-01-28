@@ -2,23 +2,24 @@ import * as types from '../constants/ActionTypes'
 import { toCAD } from '../utils/formatUtils'
 import { queryNeighborhood } from '../actions/PropertyActions'
 
-export const displayPopup = (location, value) => (dispatch, getState) => {
+export const displayPopup = (location, rent) => (dispatch, getState) => {
   const { property, mapFeatures } = getState()
   const { map, popup, bedrooms } = mapFeatures
+  const { average_price, number_of_rentals } = rent
   const {num} = bedrooms.find(bdr => bdr.value)
 
-  if (value > 0) {
+  if (average_price > 0) {
     map.getCanvas().style.cursor = 'pointer'
 
     const popupText = `
       <div class="width-150">
-        <h5>${toCAD(value)} / ${num} bdr<span></span></h5>
-        <div>AVERAGE RENT</div>
+        <h6 class="lead">${toCAD(average_price)} / ${num} bdr</h6>
         ${
           property.neighborhood
-            ? `<div class="text-muted">In ${property.neighborhood}</div>`
+            ? `<div>In ${property.neighborhood}</div>`
             : ''
         }
+        <div class="text-muted">based on ${number_of_rentals} rentals</div>
       </div>`
     popup
       .setLngLat(location.lngLat)
@@ -41,7 +42,7 @@ export const hoverPolygon = e => (dispatch, getState) => {
   const rent = rents.find(rent => rent.ctuid === ctuid)
 
   if (rent) {
-    dispatch(displayPopup(e, rent.average_price))
+    dispatch(displayPopup(e, rent))
     dispatch(queryNeighborhood(e))
     dispatch({ type: types.UPDATE_RENT, rent })
   } else {

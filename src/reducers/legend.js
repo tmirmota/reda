@@ -3,25 +3,20 @@ import * as types from '../constants/ActionTypes'
 const initialState = {
   minValue: null,
   maxValue: null,
-  beginColor: '#ffff00',
-  endColor: '#dd2c00'
+  beginColor: 'rgba(255, 255, 0, .7)',
+  endColor: 'rgba(255, 0, 0, .7)',
 }
 
 const legend = (state = initialState, action) => {
   switch (action.type) {
     case types.UPDATE_LEGEND:
-      return {
-        minValue: action.minValue,
-        maxValue: action.maxValue,
-        beginColor: action.beginColor,
-        endColor: action.endColor,
-      }
+      return { ...state, ...action, }
 
-    case types.UPDATE_MINMAX: 
+    case types.UPDATE_MINMAX:
       return {
         ...state,
         minValue: action.minValue,
-        maxValue: action.maxValue
+        maxValue: action.maxValue,
       }
 
     default:

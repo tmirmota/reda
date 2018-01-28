@@ -4,23 +4,26 @@ import React, { Component } from 'react'
 import SidebarContainer from '../containers/SidebarContainer'
 import MapContainer from '../containers/MapContainer'
 import LegendContainer from '../containers/LegendContainer'
+import HeaderContainer from '../containers/HeaderContainer'
 
 // Components
-import ErrorMessage from '../components/ErrorMessage'
+import FocusView from '../components/FocusView'
 
 class Root extends Component {
   render() {
-    // if (window.innerWidth <= 768) return <ErrorMessage />
+    const { mapFeatures, fetchRents } = this.props
     return (
-      <section className="container-fluid h-100 no-bleed">
-        <div className="row h-100">
-          <SidebarContainer />
-          <div className="col">
-            <MapContainer />
-          </div>
-          <LegendContainer />
-        </div>
-      </section>
+      <div>
+        {/* <HeaderContainer /> */}
+        <MapContainer />
+        <SidebarContainer />
+        <LegendContainer />
+        <FocusView
+          active={mapFeatures.redoSearch}
+          onClick={fetchRents}
+          label="Focus View"
+        />
+      </div>
     )
   }
 }

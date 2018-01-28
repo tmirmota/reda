@@ -25,7 +25,7 @@ const map = (state = initialState, action) => {
         [name]: state[name].map(({ num, value }) => {
           return {
             num,
-            value: num === action.num ? !action.value : false
+            value: num === action.num
           }
         })
       }

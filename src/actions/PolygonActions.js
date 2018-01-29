@@ -5,21 +5,19 @@ import { queryNeighborhood } from '../actions/PropertyActions'
 export const displayPopup = (location, rent) => (dispatch, getState) => {
   const { property, mapFeatures } = getState()
   const { map, popup, bedrooms } = mapFeatures
-  const { average_price, number_of_rentals } = rent
-  const {num} = bedrooms.find(bdr => bdr.value)
+  const { price, count } = rent
+  const { num } = bedrooms.find(bdr => bdr.value)
 
-  if (average_price > 0) {
+  if (price > 0) {
     map.getCanvas().style.cursor = 'pointer'
 
     const popupText = `
       <div class="width-150">
-        <h6 class="lead">${toCAD(average_price)} / ${num} bdr</h6>
-        ${
-          property.neighborhood
-            ? `<div>In ${property.neighborhood}</div>`
-            : ''
-        }
-        <div class="text-muted">based on ${number_of_rentals} rentals</div>
+        <h6 class="lead">${toCAD(price)} / ${num}${
+      bedrooms.length === num ? '+' : ''
+    } bdr</h6>
+        ${property.neighborhood ? `<div>In ${property.neighborhood}</div>` : ''}
+        <div class="text-muted">based on ${count} rentals</div>
       </div>`
     popup
       .setLngLat(location.lngLat)
@@ -39,9 +37,30 @@ export const hoverPolygon = e => (dispatch, getState) => {
   const filterName = e.features[0].properties['CTUID']
   map.setFilter('census-tracts-fill-hover', ['==', 'CTUID', filterName])
 
-  const rent = rents.find(rent => rent.ctuid === ctuid)
+  const polyObj = rents.find(rent => rent.ctuid === ctuid)
 
-  if (rent) {
+  if (polyObj) {
+    const {
+      average_price,
+      median_price,
+      number_of_rentals,
+      average_sqft,
+      min_price,
+      max_price
+    } = polyObj
+    const price = average_price > median_price ? median_price : average_price
+    if (number_of_rentals < 5) {
+      dispatch({ type: types.RESET_RENT })
+      return false
+    }
+    const rent = {
+      price,
+      count: number_of_rentals,
+      sqft: average_sqft,
+      min: min_price,
+      max: max_price
+    }
+
     dispatch(displayPopup(e, rent))
     dispatch(queryNeighborhood(e))
     dispatch({ type: types.UPDATE_RENT, rent })

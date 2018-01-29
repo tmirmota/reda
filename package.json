@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@turf/turf": "*",
     "mapbox-gl": "^0.42.2",
     "mapbox-gl-geocoder": "^2.0.1",
     "material-ui": "^1.0.0-beta.25",
@@ -11,9 +12,9 @@
     "react-dom": "^16.2.0",
     "react-redux": "^5.0.6",
     "react-scripts": "1.0.17",
+    "recharts": "^1.0.0-beta.9",
     "redux": "^3.7.2",
-    "redux-thunk": "^2.2.0",
-    "@turf/turf": "*"
+    "redux-thunk": "^2.2.0"
   },
   "scripts": {
     "start": "react-scripts start",

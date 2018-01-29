@@ -79,9 +79,11 @@ class Map extends Component {
       map.on('mousemove', 'census-tracts-2016geojson', e => {
         hoverPolygon(e)
       })
+
       map.on('mouseleave', 'census-tracts-2016geojson', () => {
         map.setFilter('census-tracts-fill-hover', ['==', 'CTUID', ''])
         clearState()
+        popup.remove()
       })
 
       map.on('mousemove', 'properties-fill', e => {
@@ -89,6 +91,7 @@ class Map extends Component {
         map.setFilter('properties-fill-hover', ['==', 'Name', filterName])
         hoverProperty(e)
       })
+
       map.on('mouseleave', 'properties-fill', () => {
         map.setFilter('properties-fill-hover', ['==', 'Name', ''])
         clearState()

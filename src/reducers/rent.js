@@ -1,15 +1,21 @@
 import * as types from '../constants/ActionTypes'
 
 const initialState = {
+  name: 'Market Rental Price',
   price: null,
   count: null,
-  sqft: null
+  sqft: null,
+  min: null,
+  max: null,
 }
 
 const rent = (state = initialState, action) => {
   switch (action.type) {
     case types.UPDATE_RENT:
-      return action.rent
+      return {
+        ...state,
+        ...action.rent
+      }
 
     case types.RESET_RENT:
       return initialState

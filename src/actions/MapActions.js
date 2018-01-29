@@ -14,7 +14,7 @@ export const addHeatMapLayer = rents => async (dispatch, getState) => {
   const { map } = getState().mapFeatures
 
   if (rents) {
-    const filteredRents = rents.filter(rent => rent.number_of_rentals >= 10 )
+    const filteredRents = rents.filter(rent => rent.number_of_rentals >= 5 )
     const minValue = filteredRents.reduce((min, feature) => {
       const minPrice = feature.average_price
       return minPrice !== 0 && minPrice < min ? minPrice : min

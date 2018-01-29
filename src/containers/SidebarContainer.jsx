@@ -17,10 +17,12 @@ const mapStateToProps = ({
   selectedProperty,
   rent,
   filters,
+  legend,
   mapFeatures,
 }) => ({
   property,
   selectedProperty,
+  legend,
   rent,
   filters,
   mapFeatures,

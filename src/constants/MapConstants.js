@@ -2,6 +2,7 @@ export const initialMap = {
   style: 'mapbox://styles/tmirmota/cjcsggrra048b2ro9d5mq7gzp',
   center: [-123.1427207, 49.261069],
   zoom: 11,
+  maxZoom: 13.5,
   // maxBounds: [
   //   [-123.29430051866589, 49.15593259948497],
   //   [-122.89152688587282, 49.34756088632997],

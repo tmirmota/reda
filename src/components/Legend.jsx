@@ -2,7 +2,7 @@ import React from 'react'
 import Bedrooms from '../components/Bedrooms'
 import { toCAD } from '../utils/formatUtils'
 
-const Legend = ({ mapFeatures, legend, changeMetric }) => {
+const Legend = ({ mapFeatures, legend, changeMetric, rent }) => {
   const { minValue, maxValue, beginColor, endColor } = legend
   const { bedrooms } = mapFeatures
 
@@ -14,7 +14,7 @@ const Legend = ({ mapFeatures, legend, changeMetric }) => {
     
   return (
     <div className="legend shadow bg-white rounded">
-      <h6>Average Rent Range</h6>
+      <h6>{rent.name} Range</h6>
       <div style={styles} className="height-small rounded mb-1" />
       <div className="d-flex justify-content-between mb-2">
         <div>{toCAD(minValue)}</div>

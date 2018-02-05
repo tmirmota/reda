@@ -1,5 +1,5 @@
 export const initialMap = {
-  style: 'mapbox://styles/tmirmota/cjcsggrra048b2ro9d5mq7gzp',
+  style: 'mapbox://styles/tmirmota/cjd9licqs57do2rvhpfbna5p7',
   center: [-123.1427207, 49.261069],
   zoom: 11,
   maxZoom: 13.5,

@@ -35,7 +35,6 @@ export const hoverPolygon = e => (dispatch, getState) => {
   popup.remove()
   map.getCanvas().style.cursor = ''
   const filterName = e.features[0].properties['CTUID']
-  map.setFilter('census-tracts-fill-hover', ['==', 'CTUID', filterName])
 
   const polyObj = rents.find(rent => rent.ctuid === ctuid)
 
@@ -62,7 +61,7 @@ export const hoverPolygon = e => (dispatch, getState) => {
     }
 
     dispatch(displayPopup(e, rent))
-    dispatch(queryNeighborhood(e))
+    // dispatch(queryNeighborhood(e))
     dispatch({ type: types.UPDATE_RENT, rent })
   } else {
     dispatch({ type: types.RESET_RENT })

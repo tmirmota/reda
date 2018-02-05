@@ -19,7 +19,7 @@ const Sidebar = props => {
     return (
       <div>
         <RegionSidebar {...props} />
-        <Filters {...props} className="bottom-left m-4 mb-5" />
+        <Filters {...props} className="bottom-left m-3" />
       </div>
     )
   }

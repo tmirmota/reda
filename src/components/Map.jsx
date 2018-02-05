@@ -23,6 +23,7 @@ class Map extends Component {
   componentDidMount() {
     const {
       initMap,
+      geoCodeResult,
       hoverProperty,
       hoverPolygon,
       showRedoSearch,
@@ -38,50 +39,36 @@ class Map extends Component {
 
     const desktop = window.innerWidth >= 768
 
-    if (desktop) {
-          // map.addControl(
-    //   new MapboxGeocoder({
-    //     accessToken: MAPBOX_ACCESS_TOKEN,
-    //     ...configSearch,
-    //   }),
-    //   'top-right',
-    // )
+    const geocoder = new MapboxGeocoder({
+      accessToken: MAPBOX_ACCESS_TOKEN,
+      ...configSearch,
+    })
 
+    geocoder.on('result', ev => {
+      geoCodeResult(ev.result)
+    })
+
+    if (desktop) {
+      map.addControl(geocoder, 'top-right')
       map.addControl(new mapboxgl.NavigationControl(), 'top-right')
     }
 
+
+
     const popup = new mapboxgl.Popup({
       ...initialPopup,
-    })  
+    })
 
     map.on('load', () => {
       initMap(map, popup)
-      addSources(map)
-      addLayers(map)
-
-      map.addLayer(
-        {
-          id: 'census-tracts-fill-hover',
-          source: 'census-tracts',
-          'source-layer': 'census_tracts_2016geojson',
-          minzoom: 9,
-          maxzoom: 14,
-          type: 'line',
-          paint: {
-            'line-color': '#4fc3f7',
-            'line-width': 3
-          },
-          filter: ['==', 'CTUID', '']
-        },
-        'water'
-      )
 
       map.on('mousemove', 'census-tracts-2016geojson', e => {
+        // map.setFilter('census-tracts-fill-hover', ['==', 'CTUID', filterName])
         hoverPolygon(e)
       })
 
       map.on('mouseleave', 'census-tracts-2016geojson', () => {
-        map.setFilter('census-tracts-fill-hover', ['==', 'CTUID', ''])
+        // map.setFilter('census-tracts-fill-hover', ['==', 'CTUID', ''])
         clearState()
         popup.remove()
       })
@@ -100,6 +87,24 @@ class Map extends Component {
       map.on('move', () => {
         showRedoSearch()
       })
+
+      map.addSource('search-point', {
+        "type": "geojson",
+        "data": {
+          "type": "FeatureCollection",
+          "features": []
+        }
+      });
+
+      map.addLayer({
+        "id": "point",
+        "source": "search-point",
+        "type": "circle",
+        "paint": {
+          "circle-radius": 10,
+          "circle-color": "#007cbf"
+        }
+      });
     })
   }
 }

@@ -90,6 +90,11 @@ MAPBOX
   min-width: 300px !important;
 }
 
+.mapboxgl-ctrl-bottom-left,
+.mapbox-improve-map {
+  display: none !important;
+}
+
 /* =========================================================
 GENERAL
 ========================================================= */

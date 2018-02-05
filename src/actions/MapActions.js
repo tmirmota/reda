@@ -10,6 +10,16 @@ export const clearState = () => ({
   type: types.RESET_STATE,
 })
 
+export const geoCodeResult = result => (dispatch, getState)=> {
+  const { map } = getState().mapFeatures
+  const place_type = result.place_type[0]
+  if (place_type === 'address') {
+
+    map.getSource('search-point').setData(result.geometry);
+
+  }
+}
+
 export const addHeatMapLayer = rents => async (dispatch, getState) => {
   const { map } = getState().mapFeatures
 

@@ -5,6 +5,6 @@ import { changeMetric } from '../actions/MapActions'
 
 const LegendComponent = props => <Legend {...props} />
 
-const mapStateToProps = ({ legend, rent, mapFeatures }) => ({ legend, rent, mapFeatures })
+const mapStateToProps = ({ legend, rent, mapFeatures, properties }) => ({ legend, rent, mapFeatures, properties })
 
 export default connect(mapStateToProps, { changeMetric })(LegendComponent)

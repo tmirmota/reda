@@ -1,22 +1,24 @@
 import { combineReducers } from 'redux'
 
 // Reducers
-import mapFeatures from './mapFeatures'
-import filters from './filters'
 import rent from './rent'
 import rents from './rents'
-import property from './property'
-import selectedProperty from './selectedProperty'
 import legend from './legend'
+import filters from './filters'
+import property from './property'
+import properties from './properties'
+import mapFeatures from './mapFeatures'
+import selectedProperty from './selectedProperty'
 
 const rootReducer = combineReducers({
-  mapFeatures,
-  filters,
   rent,
   rents,
-  property,
-  selectedProperty,
   legend,
+  filters,
+  property,
+  properties,
+  mapFeatures,
+  selectedProperty,
 })
 
 export default rootReducer

@@ -1,8 +1,9 @@
 import React from 'react'
 import Bedrooms from '../components/Bedrooms'
 import { toCAD } from '../utils/formatUtils'
+import InputSelection from '../components/InputSelection'
 
-const Legend = ({ mapFeatures, legend, changeMetric, rent }) => {
+const Legend = ({ mapFeatures, legend, changeMetric, rent, properties }) => {
   const { minValue, maxValue, beginColor, endColor } = legend
   const { bedrooms } = mapFeatures
 
@@ -14,6 +15,15 @@ const Legend = ({ mapFeatures, legend, changeMetric, rent }) => {
     
   return (
     <div className="legend shadow bg-white rounded">
+      <InputSelection options={
+        properties.map(property => {
+          const value = property['TO_CIVIC_NUMBER']
+          return ({
+            value,
+            label: value
+          })
+        })
+      } />
       <h6>{rent.name} Range</h6>
       <div style={styles} className="height-small rounded mb-1" />
       <div className="d-flex justify-content-between mb-2">

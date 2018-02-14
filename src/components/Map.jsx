@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { addSources, addLayers } from '../utils/mapUtils'
+import MapOverlay from '../components/MapOverlay'
 
 // Mapbox
 import mapboxgl from 'mapbox-gl'
@@ -11,13 +12,23 @@ import {
   initialMap,
 } from '../constants/MapConstants'
 
+const styles = {
+  containerSize: {
+    width: '100%',
+    height: 'calc(100vh - 64px)'
+  }
+}
+
 class Map extends Component {
   render() {
     return (
-      <div
-        ref={el => (this.mapContainer = el)}
-        className="absolute top right left bottom"
-      />
+      <div>
+        <div
+          ref={el => (this.mapContainer = el)}
+          style={styles.containerSize}
+        />
+        {/*<MapOverlay />*/}
+      </div>
     )
   }
   componentDidMount() {
@@ -53,8 +64,6 @@ class Map extends Component {
       map.addControl(new mapboxgl.NavigationControl(), 'top-right')
     }
 
-
-
     const popup = new mapboxgl.Popup({
       ...initialPopup,
     })
@@ -89,22 +98,22 @@ class Map extends Component {
       })
 
       map.addSource('search-point', {
-        "type": "geojson",
-        "data": {
-          "type": "FeatureCollection",
-          "features": []
-        }
-      });
+        type: 'geojson',
+        data: {
+          type: 'FeatureCollection',
+          features: [],
+        },
+      })
 
       map.addLayer({
-        "id": "point",
-        "source": "search-point",
-        "type": "circle",
-        "paint": {
-          "circle-radius": 10,
-          "circle-color": "#007cbf"
-        }
-      });
+        id: 'point',
+        source: 'search-point',
+        type: 'circle',
+        paint: {
+          'circle-radius': 10,
+          'circle-color': '#007cbf',
+        },
+      })
     })
   }
 }

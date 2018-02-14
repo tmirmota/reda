@@ -15,15 +15,17 @@ const Legend = ({ mapFeatures, legend, changeMetric, rent, properties }) => {
     
   return (
     <div className="legend shadow bg-white rounded">
+      <div>
       <InputSelection options={
         properties.map(property => {
-          const value = property['TO_CIVIC_NUMBER']
+          const value = property['FROM_CIVIC_NUMBER']
           return ({
             value,
             label: value
           })
         })
       } />
+      </div>
       <h6>{rent.name} Range</h6>
       <div style={styles} className="height-small rounded mb-1" />
       <div className="d-flex justify-content-between mb-2">

@@ -1,29 +1,28 @@
 import React, { Component } from 'react'
-
-// Containers
-import SidebarContainer from '../containers/SidebarContainer'
+import { Layout, Row, Col } from 'antd'
 import MapContainer from '../containers/MapContainer'
-import LegendContainer from '../containers/LegendContainer'
-import HeaderContainer from '../containers/HeaderContainer'
 
-// Components
-import FocusView from '../components/FocusView'
+const { Header, Content } = Layout
+
 
 class Root extends Component {
   render() {
-    const { mapFeatures, fetchRents } = this.props
     return (
-      <div>
-        {/* <HeaderContainer /> */}
-        <MapContainer />
-        <SidebarContainer />
-        <LegendContainer />
-        <FocusView
-          active={mapFeatures.redoSearch}
-          onClick={fetchRents}
-          label="Focus View"
-        />
-      </div>
+      <Layout style={{ minHeight: '100vh' }}>
+        <Layout>
+          <Header>Header</Header>
+          <Content>
+            <div>
+            <Row>
+              <Col span={8}>Hello World</Col>
+              <Col span={16}>
+                <MapContainer />
+              </Col>
+            </Row>
+            </div>
+          </Content>
+        </Layout>
+      </Layout>
     )
   }
 }

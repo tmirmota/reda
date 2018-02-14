@@ -10,39 +10,37 @@ class Root extends Component {
   render() {
     return (
       <Layout style={{ minHeight: '100vh' }}>
-        <Layout>
-          <Header>
-            <Menu theme="dark" mode="horizontal" style={{ lineHeight: '64px' }}>
-              <Menu.Item key="home">
-                <Link to="/">Home</Link>
-              </Menu.Item>
-              <Menu.Item key="map">
-                <Link to="/map">
-                  Map
-                </Link>
-              </Menu.Item>
-            </Menu>
-          </Header>
-          <Content>
-            <div>
-              <Row>
-                <Col span={8}>
-                  <Tabs>
-                    <TabPane tab="Charts" key="charts">
-                      Charts
-                    </TabPane>
-                    <TabPane tab="Filters" key="filters">
-                      Filters
-                    </TabPane>
-                  </Tabs>
-                </Col>
-                <Col span={16}>
-                  <Route path="/map" component={MapContainer} />
-                </Col>
-              </Row>
-            </div>
-          </Content>
-        </Layout>
+        <Header>
+          <Menu theme="dark" mode="horizontal" style={{ lineHeight: '64px' }}>
+            <Menu.Item key="home">
+              <Link to="/">Home</Link>
+            </Menu.Item>
+            <Menu.Item key="map">
+              <Link to="/map">Map</Link>
+            </Menu.Item>
+          </Menu>
+        </Header>
+        <Content>
+          <div>
+            <Row>
+              <Col span={8}>
+                <Tabs>
+                  <TabPane tab="Charts" key="charts">
+                    <Link to="/map">Map</Link>
+                    <Link to="/">Home</Link>
+                  </TabPane>
+                  <TabPane tab="Filters" key="filters">
+                    Filters
+                  </TabPane>
+                </Tabs>
+              </Col>
+              <Col span={16}>
+                <Route exact path="/" render={() => <h3>hello world</h3>} />
+                <Route path="/map" component={MapContainer} />
+              </Col>
+            </Row>
+          </div>
+        </Content>
       </Layout>
     )
   }

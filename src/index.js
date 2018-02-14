@@ -3,20 +3,26 @@ import ReactDOM from 'react-dom'
 import { createStore, applyMiddleware } from 'redux'
 import { Provider } from 'react-redux'
 import thunkMiddleware from 'redux-thunk'
-import { BrowserRouter as Router } from 'react-router-dom'
+import { ConnectedRouter, routerMiddleware } from 'react-router-redux'
+import createHistory from 'history/createBrowserHistory'
 import registerServiceWorker from './registerServiceWorker'
 
 import './index.css'
 import rootReducer from './reducers/index'
 import RootContainer from './containers/RootContainer'
 
-const store = createStore(rootReducer, applyMiddleware(thunkMiddleware))
+const history = createHistory()
+
+const store = createStore(
+  rootReducer,
+  applyMiddleware(thunkMiddleware, routerMiddleware(history)),
+)
 
 ReactDOM.render(
   <Provider store={store}>
-    <Router>
+    <ConnectedRouter history={history}>
       <RootContainer />
-    </Router>
+    </ConnectedRouter>
   </Provider>,
   document.getElementById('root'),
 )

@@ -1,4 +1,5 @@
 import { combineReducers } from 'redux'
+import { routerReducer } from 'react-router-redux'
 
 // Reducers
 import rent from './rent'
@@ -19,6 +20,7 @@ const rootReducer = combineReducers({
   properties,
   mapFeatures,
   selectedProperty,
+  router: routerReducer
 })
 
 export default rootReducer

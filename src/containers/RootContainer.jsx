@@ -10,9 +10,18 @@ const RootComponent = props => (
   </Router>
 )
 
-const mapStateToProps = ({ mapFeatures, location }) => ({
+const mapStateToProps = ({
   mapFeatures,
   location,
+  rent,
+  property,
+  legend,
+}) => ({
+  mapFeatures,
+  location,
+  rent,
+  property,
+  legend,
 })
 
 export default connect(mapStateToProps, { fetchRents })(RootComponent)

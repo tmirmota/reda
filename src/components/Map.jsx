@@ -60,7 +60,7 @@ class Map extends Component {
     })
 
     if (desktop) {
-      map.addControl(geocoder, 'top-right')
+      map.addControl(geocoder, 'top-left')
       map.addControl(new mapboxgl.NavigationControl(), 'top-right')
     }
 

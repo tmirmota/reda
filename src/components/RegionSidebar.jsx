@@ -15,7 +15,7 @@ const RegionSidebar = ({ rent, property, mapFeatures, legend }) => {
   const { neighborhood, city } = property
   const { bedrooms, redoSearch } = mapFeatures
   return (
-    <div className="census-tract top-left p-4 m-3 shadow rounded fixed-w-300 d-flex flex-column">
+    <div className="census-tract d-flex flex-column">
       <h4>
         {neighborhood}
         {neighborhood && city && ', '}
